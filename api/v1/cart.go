@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"time"
@@ -58,7 +57,7 @@ func (c *CartRouter) Routes() []router.PathObject {
 		{
 			Path:   "/{id}",
 			Method: "GET",
-			Func:   c.getCart,
+			Func:   handlers.HttpGet(c.getCart),
 		},
 		{
 			Path:   "/{id}",
@@ -87,44 +86,17 @@ func (c *CartRouter) createCart(ctx context.Context, r *http.Request, cart *Cart
 	return c.Store.Create(ctx, cart)
 }
 
-func (c *CartRouter) getCart(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+func (c *CartRouter) getCart(ctx context.Context, r *http.Request) (*Cart, error) {
+	if c.Store == nil {
+		return nil, errors.New("cart store is not initialized")
+	}
 
 	id, err := handlers.GetUUIDFromPathValue(r, "id")
 	if err != nil {
-		(&router.ErrorResponse{
-			Status:  http.StatusBadRequest,
-			Path:    r.URL.Path,
-			Message: "Invalid cart ID in path",
-			Error:   err.Error(),
-		}).WriteTo(w)
-		return
+		return nil, err
 	}
 
-	cart, err := c.Store.Get(ctx, id)
-	if err != nil {
-		(&router.ErrorResponse{
-			Status:  http.StatusInternalServerError,
-			Path:    r.URL.Path,
-			Message: "Failed to retrieve cart",
-			Error:   err.Error(),
-		}).WriteTo(w)
-		return
-	}
-
-	// TODO: when url param format is "full", include full item details
-
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(cart)
-	if err != nil {
-		(&router.ErrorResponse{
-			Status:  http.StatusInternalServerError,
-			Path:    r.URL.Path,
-			Message: "Failed to encode cart",
-			Error:   err.Error(),
-		}).WriteTo(w)
-		return
-	}
+	return c.Store.Get(ctx, id)
 }
 
 func (c *CartRouter) updateCart(ctx context.Context, r *http.Request, cart *Cart) error {
