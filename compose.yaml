@@ -1,0 +1,10 @@
+services:
+  item:
+    container_name: item
+    hostname: item
+    image: leonsteinhaeuser/demo-shop-item:dev
+    build:
+      context: .
+      dockerfile: cmd/item/Containerfile
+    ports:
+      - "8080:8080"
