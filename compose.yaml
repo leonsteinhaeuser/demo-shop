@@ -8,3 +8,12 @@ services:
       dockerfile: cmd/item/Containerfile
     ports:
       - "8080:8080"
+  cart:
+    container_name: cart
+    hostname: cart
+    image: leonsteinhaeuser/demo-shop-cart:dev
+    build:
+      context: .
+      dockerfile: cmd/cart/Containerfile
+    ports:
+      - "8081:8080"
