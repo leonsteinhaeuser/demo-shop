@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"net/http"
 	"path"
-	"strings"
 )
 
 // ApiMeta defines the interface for API route objects
@@ -103,21 +102,16 @@ func (r *Router) Register(obj ApiObject) error {
 func (r *Router) Build(mux *http.ServeMux) error {
 	// iterate over all registered API objects
 	for fqp, obj := range r.apiObjects {
-		slog.Debug("Registering API object", "path", fqp)
+		slog.Info("Registering API object", "path", fqp)
 		for _, pobj := range obj.Routes() {
 			fpath := path.Join(fqp, pobj.Path)
+			slog.Info("Route", "method", pobj.Method, "path", fpath)
+			r.apiSpec = append(r.apiSpec, ApiObjectMeta{
+				Path:   fpath,
+				Method: pobj.Method,
+			})
 			mux.HandleFunc(pobj.Method+" "+fpath, pobj.Func)
 		}
-	}
-	for route, handler := range r.rawRoutes {
-		// register raw routes with the mux
-		slog.Debug("Registering route", "path", route)
-		// the route is in the format "METHOD PATH"
-		r.apiSpec = append(r.apiSpec, ApiObjectMeta{
-			Path:   route[strings.Index(route, " ")+1:],
-			Method: route[:strings.Index(route, " ")],
-		})
-		mux.HandleFunc(route, handler)
 	}
 	mux.HandleFunc("/api/metadata", func(wrt http.ResponseWriter, req *http.Request) {
 		wrt.Header().Set("Content-Type", "application/json")
