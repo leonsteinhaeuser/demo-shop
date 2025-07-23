@@ -1,0 +1,36 @@
+package main
+
+import (
+	"log/slog"
+	"net/http"
+	"os"
+
+	v1 "github.com/leonsteinhaeuser/demo-shop/api/v1"
+	"github.com/leonsteinhaeuser/demo-shop/internal/router"
+)
+
+func main() {
+	mux := http.NewServeMux()
+
+	var (
+		userStore v1.UserStore
+	)
+
+	err := router.DefaultRouter.Register(&v1.UserRouter{UserStore: userStore})
+	if err != nil {
+		slog.Error("Failed to register user router", "error", err)
+		os.Exit(1)
+	}
+
+	err = router.DefaultRouter.Build(mux)
+	if err != nil {
+		slog.Error("Failed to build router", "error", err)
+		os.Exit(1)
+	}
+	slog.Info("Starting server on :8080")
+	if err := http.ListenAndServe(":8080", mux); err != nil {
+		slog.Error("Failed to start server", "error", err)
+		os.Exit(1)
+	}
+	slog.Warn("Server stopped")
+}

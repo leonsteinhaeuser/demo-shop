@@ -1,0 +1,10 @@
+FROM golang:alpine AS builder
+WORKDIR /app
+ADD . .
+RUN go mod download && \
+    go build -o /tmp/user ./cmd/user/main.go
+
+FROM alpine:latest as final
+COPY --from=builder /tmp/user /usr/local/bin/user
+EXPOSE 8080
+ENTRYPOINT /usr/local/bin/user
