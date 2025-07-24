@@ -24,6 +24,9 @@ services:
     build:
       context: .
       dockerfile: cmd/cartpresentation/Containerfile
+    environment:
+      CART_SERVICE_URL: "http://cart:8080"
+      ITEM_SERVICE_URL: "http://item:8080"
     ports:
       - "8082:8080"
   user:

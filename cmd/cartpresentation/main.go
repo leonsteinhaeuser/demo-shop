@@ -6,15 +6,22 @@ import (
 	"os"
 
 	v1 "github.com/leonsteinhaeuser/demo-shop/api/v1"
+	clientv1 "github.com/leonsteinhaeuser/demo-shop/clients/v1"
+	"github.com/leonsteinhaeuser/demo-shop/internal/env"
 	"github.com/leonsteinhaeuser/demo-shop/internal/router"
+)
+
+var (
+	cartServiceURL = env.StringEnvOrDefault("CART_SERVICE_URL", "http://localhost:8080")
+	itemServiceURL = env.StringEnvOrDefault("ITEM_SERVICE_URL", "http://localhost:8080")
 )
 
 func main() {
 	mux := http.NewServeMux()
 
 	var (
-		cartStore v1.CartStore
-		itemStore v1.ItemStore
+		cartStore v1.CartStore = clientv1.NewCartClient(cartServiceURL)
+		itemStore v1.ItemStore = clientv1.NewItemClient(itemServiceURL)
 	)
 
 	err := router.DefaultRouter.Register(&v1.CartPresentationRouter{ItemStore: itemStore, CartStore: cartStore})

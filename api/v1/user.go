@@ -57,7 +57,7 @@ func (u *UserRouter) GetApiVersion() string {
 }
 
 func (u *UserRouter) GetGroup() string {
-	return "auth"
+	return "core"
 }
 
 func (u *UserRouter) GetKind() string {
