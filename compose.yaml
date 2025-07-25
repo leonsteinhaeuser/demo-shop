@@ -38,3 +38,15 @@ services:
       dockerfile: cmd/user/Containerfile
     ports:
       - "8083:8080"
+  checkout:
+    container_name: checkout
+    hostname: checkout
+    image: leonsteinhaeuser/demo-shop-checkout:dev
+    build:
+      context: .
+      dockerfile: cmd/checkout/Containerfile
+    environment:
+      CART_SERVICE_URL: "http://cart:8080"
+      ITEM_SERVICE_URL: "http://item:8080"
+    ports:
+      - "8084:8080"

@@ -1,0 +1,10 @@
+FROM golang:alpine AS builder
+WORKDIR /app
+ADD . .
+RUN go mod download && \
+    go build -o /tmp/checkout ./cmd/checkout/main.go
+
+FROM alpine:latest as final
+COPY --from=builder /tmp/checkout /usr/local/bin/checkout
+EXPOSE 8080
+ENTRYPOINT /usr/local/bin/checkout

@@ -18,6 +18,7 @@ type Clients struct {
 	Cart             apiv1.CartStore
 	Item             apiv1.ItemStore
 	User             apiv1.UserStore
+	Checkout         apiv1.CheckoutStore
 	CartPresentation *CartPresentationClient
 }
 
@@ -32,6 +33,7 @@ func NewClients(config Config) *Clients {
 		Cart:             NewCartClientWithHTTPClient(config.BaseURL, httpClient),
 		Item:             NewItemClientWithHTTPClient(config.BaseURL, httpClient),
 		User:             NewUserClientWithHTTPClient(config.BaseURL, httpClient),
+		Checkout:         NewCheckoutClientWithHTTPClient(config.BaseURL, httpClient),
 		CartPresentation: NewCartPresentationClientWithHTTPClient(config.BaseURL, httpClient),
 	}
 }

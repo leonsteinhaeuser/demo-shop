@@ -30,6 +30,12 @@ func TestClientURLGeneration(t *testing.T) {
 	if cartPresentationClient.baseURL != baseURL {
 		t.Errorf("Expected cart presentation client baseURL %s, got %s", baseURL, cartPresentationClient.baseURL)
 	}
+
+	// Test checkout client URL generation
+	checkoutClient := NewCheckoutClient(baseURL)
+	if checkoutClient.baseURL != baseURL {
+		t.Errorf("Expected checkout client baseURL %s, got %s", baseURL, checkoutClient.baseURL)
+	}
 }
 
 func TestClientsFactory(t *testing.T) {
@@ -47,6 +53,10 @@ func TestClientsFactory(t *testing.T) {
 
 	if clients.User == nil {
 		t.Error("Expected User client to be initialized")
+	}
+
+	if clients.Checkout == nil {
+		t.Error("Expected Checkout client to be initialized")
 	}
 
 	if clients.CartPresentation == nil {
