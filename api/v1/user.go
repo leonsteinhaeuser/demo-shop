@@ -25,6 +25,8 @@ type User struct {
 	GivenName     *string `json:"given_name,omitempty"`
 	FamilyName    *string `json:"family_name,omitempty"`
 	Locale        *string `json:"locale,omitempty"`
+
+	IsAdmin bool `json:"is_admin"`
 }
 
 type UserModificationRequest struct {

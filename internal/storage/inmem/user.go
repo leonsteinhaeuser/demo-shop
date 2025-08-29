@@ -36,6 +36,8 @@ func NewUserInMemStorage() *UserInMemStorage {
 					GivenName:     utils.StringPtr("Root"),
 					FamilyName:    utils.StringPtr("User"),
 					Locale:        utils.StringPtr("en/US"),
+
+					IsAdmin: true,
 				},
 				Password: utils.StringPtr("root"),
 			},

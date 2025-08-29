@@ -76,7 +76,6 @@ func (c *CartRouter) createCart(ctx context.Context, r *http.Request, cart *Cart
 	if c.Store == nil {
 		return errors.New("cart store is not initialized")
 	}
-
 	if cart.ID == uuid.Nil {
 		cart.ID = uuid.New()
 	}
