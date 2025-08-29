@@ -7,13 +7,14 @@ import (
 
 	v1 "github.com/leonsteinhaeuser/demo-shop/api/v1"
 	"github.com/leonsteinhaeuser/demo-shop/internal/router"
+	"github.com/leonsteinhaeuser/demo-shop/internal/storage/inmem"
 )
 
 func main() {
 	mux := http.NewServeMux()
 
 	var (
-		itemStore v1.ItemStore
+		itemStore v1.ItemStore = inmem.NewItemInMemStorage()
 	)
 
 	err := router.DefaultRouter.Register(&v1.ItemRouter{Store: itemStore})
