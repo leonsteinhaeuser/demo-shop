@@ -127,3 +127,32 @@ func (r *Router) Build(mux *http.ServeMux) error {
 	})
 	return nil
 }
+
+func EnableCorsHeader(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Allow requests from any origin
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+
+		// Allow specific HTTP methods
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
+
+		// Allow specific headers
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept, Origin")
+
+		// Set max age for preflight cache
+		w.Header().Set("Access-Control-Max-Age", "86400")
+
+		// Add no-cache headers for development
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
+
+		// Handle preflight OPTIONS request
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}

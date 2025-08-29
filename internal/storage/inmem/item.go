@@ -3,6 +3,7 @@ package inmem
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	apiv1 "github.com/leonsteinhaeuser/demo-shop/api/v1"
@@ -25,24 +26,48 @@ func NewItemInMemStorage() *ItemInMemStorage {
 	return &ItemInMemStorage{
 		items: map[string]*apiv1.Item{
 			itemApple.String(): {
-				ID:    itemApple,
-				Name:  "Apple",
-				Price: 0.75,
+				ID:        itemApple,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+
+				Name:        "Apple",
+				Description: "A juicy red apple",
+				Price:       0.75,
+				Quantity:    200,
+				Location:    "Aisle 1",
 			},
 			itemBanana.String(): {
-				ID:    itemBanana,
-				Name:  "Banana",
-				Price: 1.99,
+				ID:        itemBanana,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+
+				Name:        "Banana",
+				Description: "A ripe yellow banana",
+				Price:       1.99,
+				Quantity:    150,
+				Location:    "Aisle 1",
 			},
 			itemOrange.String(): {
-				ID:    itemOrange,
-				Name:  "Orange",
-				Price: 3.00,
+				ID:        itemOrange,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+
+				Name:        "Orange",
+				Description: "A sweet orange",
+				Price:       3.00,
+				Quantity:    100,
+				Location:    "Aisle 1",
 			},
 			itemMango.String(): {
-				ID:    itemMango,
-				Name:  "Mango",
-				Price: 4.00,
+				ID:        itemMango,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+
+				Name:        "Mango",
+				Description: "A ripe mango",
+				Price:       4.00,
+				Quantity:    100,
+				Location:    "Aisle 1",
 			},
 		},
 	}

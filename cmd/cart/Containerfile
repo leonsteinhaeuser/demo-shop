@@ -4,7 +4,7 @@ ADD . .
 RUN go mod download && \
     go build -o /tmp/cart ./cmd/cart/main.go
 
-FROM alpine:latest as final
+FROM alpine:latest AS final
 COPY --from=builder /tmp/cart /usr/local/bin/cart
 EXPOSE 8080
 ENTRYPOINT /usr/local/bin/cart

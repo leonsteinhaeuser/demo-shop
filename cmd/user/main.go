@@ -29,7 +29,7 @@ func main() {
 		os.Exit(1)
 	}
 	slog.Info("Starting server on :8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	if err := http.ListenAndServe(":8080", router.EnableCorsHeader(mux)); err != nil {
 		slog.Error("Failed to start server", "error", err)
 		os.Exit(1)
 	}
