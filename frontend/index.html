@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Shop Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-store"></i> Demo Shop</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#dashboard" class="nav-link active" data-view="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a></li>
+                <li><a href="#items" class="nav-link" data-view="items">
+                    <i class="fas fa-box"></i> Items
+                </a></li>
+                <li><a href="#users" class="nav-link" data-view="users">
+                    <i class="fas fa-users"></i> Users
+                </a></li>
+                <li><a href="#carts" class="nav-link" data-view="carts">
+                    <i class="fas fa-shopping-cart"></i> Carts
+                </a></li>
+                <li><a href="#checkouts" class="nav-link" data-view="checkouts">
+                    <i class="fas fa-credit-card"></i> Checkouts
+                </a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="header-actions">
+                    <button id="refresh-btn" class="btn btn-primary">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-items">0</h3>
+                            <p>Total Items</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-users">0</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-carts">0</h3>
+                            <p>Active Carts</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-checkouts">0</h3>
+                            <p>Total Checkouts</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-charts">
+                    <div class="chart-container">
+                        <h3>Recent Activity</h3>
+                        <div id="recent-activity" class="activity-list">
+                            <!-- Recent activity will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items View -->
+            <div id="items-view" class="view">
+                <div class="view-header">
+                    <button id="add-item-btn" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add Item
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="items-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Location</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Items will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Users View -->
+            <div id="users-view" class="view">
+                <div class="view-header">
+                    <button id="add-user-btn" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add User
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="users-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Email Verified</th>
+                                <th>Preferred Name</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Users will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Carts View -->
+            <div id="carts-view" class="view">
+                <div class="view-header">
+                    <button id="add-cart-btn" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add Cart
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="carts-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Owner ID</th>
+                                <th>Items Count</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Carts will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Checkouts View -->
+            <div id="checkouts-view" class="view">
+                <div class="view-header">
+                    <button id="add-checkout-btn" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add Checkout
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="checkouts-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User ID</th>
+                                <th>Cart ID</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Checkouts will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Item Modal -->
+    <div id="item-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="item-modal-title">Add Item</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="item-form">
+                <div class="form-group">
+                    <label for="item-name">Name:</label>
+                    <input type="text" id="item-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="item-description">Description:</label>
+                    <textarea id="item-description" name="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="item-price">Price:</label>
+                    <input type="number" id="item-price" name="price" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="item-quantity">Quantity:</label>
+                    <input type="number" id="item-quantity" name="quantity" required>
+                </div>
+                <div class="form-group">
+                    <label for="item-location">Location:</label>
+                    <input type="text" id="item-location" name="location" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="user-modal-title">Add User</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="user-form">
+                <div class="form-group">
+                    <label for="user-username">Username:</label>
+                    <input type="text" id="user-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="user-email">Email:</label>
+                    <input type="email" id="user-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="user-password">Password:</label>
+                    <input type="password" id="user-password" name="password" required minlength="12">
+                </div>
+                <div class="form-group">
+                    <label for="user-preferred-name">Preferred Name:</label>
+                    <input type="text" id="user-preferred-name" name="preferred_name">
+                </div>
+                <div class="form-group">
+                    <label for="user-given-name">Given Name:</label>
+                    <input type="text" id="user-given-name" name="given_name">
+                </div>
+                <div class="form-group">
+                    <label for="user-family-name">Family Name:</label>
+                    <input type="text" id="user-family-name" name="family_name">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/demo-data.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
