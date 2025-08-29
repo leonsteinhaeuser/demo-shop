@@ -20,4 +20,8 @@ echo "Cart Presentation Service URL: $CART_PRESENTATION_SERVICE_URL"
 envsubst < /usr/share/nginx/html/config.template.js > /usr/share/nginx/html/js/config.js
 echo "Configuration generated successfully!"
 
+# Copy shop.html as index.html for the main shop experience
+cp /usr/share/nginx/html/shop.html /usr/share/nginx/html/index.html
+echo "Shop page set as default!"
+
 exec nginx -g "daemon off;"

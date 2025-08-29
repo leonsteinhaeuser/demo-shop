@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	defaultUser = uuid.New()
+	defaultUser    = uuid.New()
+	defaultRegUser = uuid.New()
 
 	_ apiv1.UserStore = (*UserInMemStorage)(nil)
 )
@@ -40,6 +41,24 @@ func NewUserInMemStorage() *UserInMemStorage {
 					IsAdmin: true,
 				},
 				Password: utils.StringPtr("root"),
+			},
+			defaultRegUser.String(): {
+				User: apiv1.User{
+					ID:        defaultRegUser,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+
+					Username:      utils.StringPtr("user"),
+					Email:         utils.StringPtr("user@localhost"),
+					EmailVerified: true,
+					PreferredName: utils.StringPtr("Regular User"),
+					GivenName:     utils.StringPtr("Regular"),
+					FamilyName:    utils.StringPtr("User"),
+					Locale:        utils.StringPtr("en/US"),
+
+					IsAdmin: false,
+				},
+				Password: utils.StringPtr("userpassword"),
 			},
 		},
 	}

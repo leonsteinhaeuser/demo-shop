@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Shop</title>
+    <link rel="stylesheet" href="css/shop.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <a href="#" onclick="router.navigate('/')">
+                    <i class="fas fa-store"></i> Demo Shop
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="router.navigate('/')" class="nav-link">
+                    <i class="fas fa-home"></i> Shop
+                </a></li>
+                <li><a href="#" onclick="router.navigate('/cart')" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i> Cart 
+                    <span id="cart-count" class="cart-count">0</span>
+                </a></li>
+                <li><a href="#" onclick="router.navigate('/profile')" class="nav-link">
+                    <i class="fas fa-user"></i> Profile
+                </a></li>
+                <li id="admin-link" class="admin-only hidden">
+                    <a href="#" onclick="router.navigate('/shop/items')" class="nav-link">
+                        <i class="fas fa-boxes"></i> Manage Items
+                    </a>
+                </li>
+            </ul>
+            <div class="nav-user">
+                <div class="user-info">
+                    <span id="user-name">Guest</span>
+                    <button id="login-btn" class="btn btn-primary">Login</button>
+                    <button id="logout-btn" class="btn btn-secondary hidden">Logout</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Shop Page (/) -->
+        <div id="shop-page" class="page active">
+            <div class="page-header">
+                <h1>Welcome to Demo Shop</h1>
+                <p>Discover amazing products and add them to your cart!</p>
+            </div>
+            
+            <div class="filters">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search products...">
+                    <button id="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="filter-options">
+                    <select id="sort-select">
+                        <option value="name">Sort by Name</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="products-grid" class="products-grid">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Profile Page (/profile) -->
+        <div id="profile-page" class="page">
+            <div class="page-header">
+                <h1>User Profile</h1>
+                <p>Manage your personal information</p>
+            </div>
+            
+            <div class="profile-container">
+                <div class="profile-form">
+                    <form id="profile-form">
+                        <div class="form-group">
+                            <label for="profile-username">Username:</label>
+                            <input type="text" id="profile-username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-email">Email:</label>
+                            <input type="email" id="profile-email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-preferred-name">Preferred Name:</label>
+                            <input type="text" id="profile-preferred-name" name="preferred_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-given-name">Given Name:</label>
+                            <input type="text" id="profile-given-name" name="given_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-family-name">Family Name:</label>
+                            <input type="text" id="profile-family-name" name="family_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-password">New Password (leave empty to keep current):</label>
+                            <input type="password" id="profile-password" name="password" minlength="12">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Page (/cart) -->
+        <div id="cart-page" class="page">
+            <div class="page-header">
+                <h1>Shopping Cart</h1>
+                <p>Review your items and proceed to checkout</p>
+            </div>
+            
+            <div class="cart-container">
+                <div id="cart-items" class="cart-items">
+                    <!-- Cart items will be loaded here -->
+                </div>
+                
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="cart-subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax:</span>
+                        <span id="cart-tax">$0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="cart-total">$0.00</span>
+                    </div>
+                    <button id="checkout-btn" class="btn btn-success btn-large">
+                        <i class="fas fa-credit-card"></i> Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Items Management Page (/shop/items) -->
+        <div id="admin-items-page" class="page admin-only">
+            <div class="page-header">
+                <h1>Items Management</h1>
+                <p>Manage store inventory</p>
+            </div>
+            
+            <div class="admin-actions">
+                <button id="add-item-btn" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Add New Item
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table id="admin-items-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Location</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Items will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Login</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-username">Username:</label>
+                    <input type="text" id="login-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <p>Don't have an account? <a href="#" id="register-link">Register here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Register</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-username">Username:</label>
+                    <input type="text" id="register-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email:</label>
+                    <input type="email" id="register-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password:</label>
+                    <input type="password" id="register-password" name="password" required minlength="12">
+                </div>
+                <div class="form-group">
+                    <label for="register-preferred-name">Preferred Name:</label>
+                    <input type="text" id="register-preferred-name" name="preferred_name">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Item Modal (for admin) -->
+    <div id="item-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="item-modal-title">Add Item</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="item-form">
+                <div class="form-group">
+                    <label for="item-name">Name:</label>
+                    <input type="text" id="item-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="item-description">Description:</label>
+                    <textarea id="item-description" name="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="item-price">Price:</label>
+                    <input type="number" id="item-price" name="price" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="item-quantity">Quantity:</label>
+                    <input type="number" id="item-quantity" name="quantity" required>
+                </div>
+                <div class="form-group">
+                    <label for="item-location">Location:</label>
+                    <input type="text" id="item-location" name="location" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Checkout Confirmation Modal -->
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Checkout Confirmation</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="checkout-summary">
+                <p>Are you sure you want to proceed with this purchase?</p>
+                <div id="checkout-items-summary"></div>
+                <div class="checkout-total">
+                    <strong>Total: <span id="checkout-total-amount">$0.00</span></strong>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                <button id="confirm-checkout-btn" class="btn btn-success">Confirm Purchase</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/shop.js"></script>
+</body>
+</html>
