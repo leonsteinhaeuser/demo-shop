@@ -1,0 +1,24 @@
+# Frontend Containerfile for Demo Shop Dashboard
+FROM nginx:alpine
+
+# Install envsubst if not available
+RUN apk add --no-cache gettext
+
+# Remove default nginx website
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy frontend files
+COPY . /usr/share/nginx/html/
+
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy and make executable the entrypoint script
+COPY ./docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+# Expose port 80
+EXPOSE 80
+
+# Start with configuration generation
+CMD ["/docker-entrypoint.sh"]
