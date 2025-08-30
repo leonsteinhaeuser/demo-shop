@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="css/shop.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
     <!-- Navigation Header -->
     <header class="header">
@@ -18,15 +20,15 @@
             </div>
             <ul class="nav-links">
                 <li><a href="#" onclick="router.navigate('/')" class="nav-link">
-                    <i class="fas fa-home"></i> Shop
-                </a></li>
+                        <i class="fas fa-home"></i> Shop
+                    </a></li>
                 <li><a href="#" onclick="router.navigate('/cart')" class="nav-link">
-                    <i class="fas fa-shopping-cart"></i> Cart 
-                    <span id="cart-count" class="cart-count">0</span>
-                </a></li>
+                        <i class="fas fa-shopping-cart"></i> Cart
+                        <span id="cart-count" class="cart-count">0</span>
+                    </a></li>
                 <li><a href="#" onclick="router.navigate('/profile')" class="nav-link">
-                    <i class="fas fa-user"></i> Profile
-                </a></li>
+                        <i class="fas fa-user"></i> Profile
+                    </a></li>
                 <li id="admin-link" class="admin-only hidden">
                     <a href="#" onclick="router.navigate('/shop/items')" class="nav-link">
                         <i class="fas fa-boxes"></i> Manage Items
@@ -51,7 +53,7 @@
                 <h1>Welcome to Demo Shop</h1>
                 <p>Discover amazing products and add them to your cart!</p>
             </div>
-            
+
             <div class="filters">
                 <div class="search-box">
                     <input type="text" id="search-input" placeholder="Search products...">
@@ -77,7 +79,7 @@
                 <h1>User Profile</h1>
                 <p>Manage your personal information</p>
             </div>
-            
+
             <div class="profile-container">
                 <div class="profile-form">
                     <form id="profile-form">
@@ -119,12 +121,12 @@
                 <h1>Shopping Cart</h1>
                 <p>Review your items and proceed to checkout</p>
             </div>
-            
+
             <div class="cart-container">
                 <div id="cart-items" class="cart-items">
                     <!-- Cart items will be loaded here -->
                 </div>
-                
+
                 <div class="cart-summary">
                     <div class="summary-row">
                         <span>Subtotal:</span>
@@ -151,7 +153,7 @@
                 <h1>Items Management</h1>
                 <p>Manage store inventory</p>
             </div>
-            
+
             <div class="admin-actions">
                 <button id="add-item-btn" class="btn btn-success">
                     <i class="fas fa-plus"></i> Add New Item
@@ -311,4 +313,5 @@
     <script src="js/router.js"></script>
     <script src="js/shop.js"></script>
 </body>
+
 </html>

@@ -22,7 +22,7 @@ class Router {
 
     async navigate(path, pushState = true) {
         this.currentPath = path;
-        
+
         if (pushState) {
             window.history.pushState({}, '', path);
         }

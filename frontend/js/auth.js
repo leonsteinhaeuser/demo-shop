@@ -14,7 +14,7 @@ class Auth {
             this.currentUser = JSON.parse(storedUser);
             this.isAuthenticated = true;
             this.updateUI();
-            
+
             // Initialize cart for restored user session asynchronously
             if (window.cart) {
                 // Use setTimeout to ensure cart initialization happens after all synchronous initialization
@@ -86,20 +86,20 @@ class Auth {
             // In a real app, you'd validate against the user service
             const users = await apiClient.getUsers();
             const user = users.find(u => u.username === credentials.username);
-            
+
             if (user) {
                 // Simulate password validation (in real app, this would be server-side)
                 this.currentUser = user;
                 this.isAuthenticated = true;
                 localStorage.setItem('demo-shop-user', JSON.stringify(user));
-                
+
                 this.updateUI();
                 this.closeModals();
-                
+
                 if (window.shop) {
                     window.shop.showToast('Login successful!', 'success');
                 }
-                
+
                 // Initialize user's cart
                 if (window.cart) {
                     await window.cart.initializeCart();
@@ -128,11 +128,11 @@ class Auth {
 
         try {
             const newUser = await apiClient.createUser(userData);
-            
+
             if (window.shop) {
                 window.shop.showToast('Registration successful! You can now login.', 'success');
             }
-            
+
             this.showLoginModal();
         } catch (error) {
             if (window.shop) {
@@ -143,26 +143,26 @@ class Auth {
 
     logout() {
         console.log('Logout started, cart items before logout:', window.cart?.items?.length || 0);
-        
+
         this.currentUser = null;
         this.isAuthenticated = false;
         localStorage.removeItem('demo-shop-user');
-        
+
         // Clear cart UI only - don't clear cart data as it should persist in API
         if (window.cart) {
             window.cart.items = [];
             window.cart.cartId = null;
             window.cart.updateCartCount();
         }
-        
+
         console.log('Logout completed, local cart cleared');
-        
+
         this.updateUI();
-        
+
         if (window.shop) {
             window.shop.showToast('Logged out successfully', 'info');
         }
-        
+
         // Redirect to home if on admin page
         if (window.router.currentPath === '/shop/items') {
             window.router.navigate('/');
@@ -179,7 +179,7 @@ class Auth {
             userName.textContent = this.currentUser.preferred_name || this.currentUser.username || 'User';
             loginBtn.classList.add('hidden');
             logoutBtn.classList.remove('hidden');
-            
+
             // Show admin link if user has is_admin = true
             if (this.isAdmin()) {
                 adminLink.classList.remove('hidden');
@@ -198,9 +198,9 @@ class Auth {
     }
 
     isAdmin() {
-        return this.isAuthenticated && 
-               this.currentUser && 
-               this.currentUser.is_admin === true;
+        return this.isAuthenticated &&
+            this.currentUser &&
+            this.currentUser.is_admin === true;
     }
 
     getCurrentUser() {

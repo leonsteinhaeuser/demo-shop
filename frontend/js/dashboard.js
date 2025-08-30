@@ -343,7 +343,7 @@ class Dashboard {
         const form = document.getElementById('user-form');
 
         title.textContent = user ? 'Edit User' : 'Add User';
-        
+
         if (user) {
             document.getElementById('user-username').value = user.username || '';
             document.getElementById('user-email').value = user.email || '';
@@ -397,7 +397,7 @@ class Dashboard {
                 await apiClient.createItem(item);
                 this.showToast('Item created successfully', 'success');
             }
-            
+
             this.closeModals();
             this.loadItems();
         } catch (error) {
@@ -430,7 +430,7 @@ class Dashboard {
                 await apiClient.createUser(user);
                 this.showToast('User created successfully', 'success');
             }
-            
+
             this.closeModals();
             this.loadUsers();
         } catch (error) {
@@ -481,7 +481,7 @@ class Dashboard {
         try {
             const cart = await apiClient.getCart(id);
             const presentation = await apiClient.getCartPresentation(id);
-            
+
             // TODO: Show cart details in a modal
             console.log('Cart:', cart);
             console.log('Cart Presentation:', presentation);
@@ -517,9 +517,9 @@ class Dashboard {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.textContent = message;
-        
+
         container.appendChild(toast);
-        
+
         // Auto remove after 5 seconds
         setTimeout(() => {
             toast.remove();

@@ -115,7 +115,7 @@ class Shop {
 
     filterProducts() {
         const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
-        
+
         this.filteredProducts = this.products.filter(product =>
             product.name.toLowerCase().includes(searchTerm) ||
             product.description.toLowerCase().includes(searchTerm)
@@ -184,7 +184,7 @@ class Shop {
 
     async handleProfileUpdate(e) {
         e.preventDefault();
-        
+
         if (!window.auth.isAuthenticated) {
             this.showToast('Please login to update profile', 'error');
             return;
@@ -192,7 +192,7 @@ class Shop {
 
         const formData = new FormData(e.target);
         const user = window.auth.getCurrentUser();
-        
+
         const updatedUser = {
             id: user.id,
             username: formData.get('username'),
@@ -210,13 +210,13 @@ class Shop {
         try {
             this.showLoading();
             await apiClient.updateUser(user.id, updatedUser);
-            
+
             // Update local user data
             const newUserData = { ...user, ...updatedUser };
             window.auth.currentUser = newUserData;
             localStorage.setItem('demo-shop-user', JSON.stringify(newUserData));
             window.auth.updateUI();
-            
+
             this.showToast('Profile updated successfully!', 'success');
         } catch (error) {
             console.error('Error updating profile:', error);
@@ -275,7 +275,7 @@ class Shop {
         const form = document.getElementById('item-form');
 
         title.textContent = item ? 'Edit Item' : 'Add Item';
-        
+
         if (item) {
             document.getElementById('item-name').value = item.name;
             document.getElementById('item-description').value = item.description;
@@ -302,7 +302,7 @@ class Shop {
 
         try {
             this.showLoading();
-            
+
             if (this.editingItemId) {
                 item.id = this.editingItemId;
                 await apiClient.updateItem(this.editingItemId, item);
@@ -311,7 +311,7 @@ class Shop {
                 await apiClient.createItem(item);
                 this.showToast('Item created successfully', 'success');
             }
-            
+
             this.closeModals();
             await this.loadAdminItems();
             await this.loadProducts(); // Refresh shop products too
@@ -367,9 +367,9 @@ class Shop {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.textContent = message;
-        
+
         container.appendChild(toast);
-        
+
         // Auto remove after 5 seconds
         setTimeout(() => {
             toast.remove();
@@ -380,7 +380,7 @@ class Shop {
 // Initialize shop when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.shop = new Shop();
-    
+
     // Initialize cart after a short delay to ensure auth is ready
     setTimeout(() => {
         if (window.auth && window.auth.isAuthenticated) {

@@ -15,7 +15,7 @@ body {
 /* Header & Navigation */
 .header {
     background: #fff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     position: fixed;
     top: 0;
     left: 0;
@@ -170,7 +170,7 @@ body {
 .product-card {
     background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     transition: transform 0.3s ease;
 }
@@ -356,7 +356,7 @@ body {
     background: white;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .data-table {
@@ -486,7 +486,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 2000;
 }
 
@@ -554,7 +554,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255,255,255,0.8);
+    background: rgba(255, 255, 255, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -571,8 +571,13 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Toast Notifications */
@@ -589,7 +594,7 @@ body {
     padding: 1rem 1.5rem;
     border-radius: 4px;
     margin-bottom: 0.5rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     animation: slideIn 0.3s ease;
 }
 
@@ -614,6 +619,7 @@ body {
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -648,30 +654,30 @@ body {
         flex-direction: column;
         gap: 1rem;
     }
-    
+
     .nav-links {
         gap: 1rem;
     }
-    
+
     .main-content {
         padding: 1rem;
         margin-top: 120px;
     }
-    
+
     .products-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 1rem;
     }
-    
+
     .cart-container {
         grid-template-columns: 1fr;
     }
-    
+
     .filters {
         flex-direction: column;
         gap: 1rem;
     }
-    
+
     .search-box {
         max-width: 100%;
     }
@@ -681,7 +687,7 @@ body {
     .products-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .modal-content {
         margin: 10% auto;
         width: 95%;

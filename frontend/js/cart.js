@@ -10,7 +10,7 @@ class Cart {
     init() {
         this.updateCartCount();
         this.setupEventListeners();
-        
+
         // Initialize cart for authenticated users
         setTimeout(() => {
             if (window.auth && window.auth.isAuthenticated) {
@@ -39,7 +39,7 @@ class Cart {
 
     async initializeCart() {
         console.log('Cart initialization started, authenticated:', window.auth.isAuthenticated);
-        
+
         if (!window.auth.isAuthenticated) {
             this.items = [];
             this.cartId = null;
@@ -51,7 +51,7 @@ class Cart {
         try {
             const user = window.auth.getCurrentUser();
             console.log('Initializing cart for user:', user);
-            
+
             if (user && user.id) {
                 // Try to find an existing cart for the user
                 await this.loadCartFromAPI(user.id);
@@ -72,10 +72,10 @@ class Cart {
             // In a real app, you might have a separate endpoint to get cart by user ID
             const cartId = userId; // Use the user ID directly as cart ID
             console.log('Loading cart from API with ID:', cartId);
-            
+
             const cart = await apiClient.getCart(cartId);
             console.log('Cart loaded from API:', cart);
-            
+
             if (cart && cart.items) {
                 this.cartId = cart.id;
                 this.items = await this.populateCartItems(cart.items || []);
@@ -100,7 +100,7 @@ class Cart {
 
     async populateCartItems(cartItems) {
         const populatedItems = [];
-        
+
         for (const cartItem of cartItems) {
             try {
                 const item = await apiClient.getItem(cartItem.item_id);
@@ -114,7 +114,7 @@ class Cart {
                 console.error('Error loading item:', cartItem.item_id, error);
             }
         }
-        
+
         return populatedItems;
     }
 
@@ -139,7 +139,7 @@ class Cart {
             console.log('Creating new cart:', cartData);
             const createdCart = await apiClient.createCart(cartData);
             console.log('Cart created successfully:', createdCart);
-            
+
             this.cartId = createdCart.id;
             this.items = [];
         } catch (error) {
@@ -161,7 +161,7 @@ class Cart {
         }
 
         const existingItemIndex = this.items.findIndex(item => item.id === product.id);
-        
+
         if (existingItemIndex >= 0) {
             this.items[existingItemIndex].quantity += quantity;
         } else {
@@ -173,7 +173,7 @@ class Cart {
 
         await this.syncCartWithAPI();
         this.updateCartCount();
-        
+
         if (window.shop) {
             window.shop.showToast(`${product.name} added to cart!`, 'success');
         }
@@ -377,7 +377,7 @@ class Cart {
         try {
             window.shop.showLoading();
             const user = window.auth.getCurrentUser();
-            
+
             // Create checkout data
             const checkoutData = {
                 user_id: user.id,
@@ -392,10 +392,10 @@ class Cart {
 
             // Clear the cart after successful checkout
             await this.clearCart();
-            
+
             // Close modal
             document.getElementById('checkout-modal').style.display = 'none';
-            
+
             if (window.shop) {
                 window.shop.showToast('Order placed successfully! Thank you for your purchase.', 'success');
             }
