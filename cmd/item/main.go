@@ -17,7 +17,7 @@ func main() {
 		itemStore v1.ItemStore = inmem.NewItemInMemStorage()
 	)
 
-	err := router.DefaultRouter.Register(&v1.ItemRouter{Store: itemStore})
+	err := router.DefaultRouter.Register(v1.NewItemRouter(itemStore))
 	if err != nil {
 		slog.Error("Failed to register item router", "error", err)
 		os.Exit(1)

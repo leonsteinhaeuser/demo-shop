@@ -17,7 +17,7 @@ func main() {
 		checkoutStore v1.CheckoutStore = inmem.NewCheckoutInMemStorage()
 	)
 
-	err := router.DefaultRouter.Register(&v1.CheckoutRouter{Store: checkoutStore})
+	err := router.DefaultRouter.Register(v1.NewCheckoutRouter(checkoutStore))
 	if err != nil {
 		slog.Error("Failed to register checkout router", "error", err)
 		os.Exit(1)

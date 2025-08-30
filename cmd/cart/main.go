@@ -17,7 +17,7 @@ func main() {
 		cartStore v1.CartStore = inmem.NewCartInMemStorage()
 	)
 
-	err := router.DefaultRouter.Register(&v1.CartRouter{Store: cartStore})
+	err := router.DefaultRouter.Register(v1.NewCartRouter(cartStore))
 	if err != nil {
 		slog.Error("Failed to register cart router", "error", err)
 		os.Exit(1)

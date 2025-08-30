@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 	"path"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // ApiMeta defines the interface for API route objects
@@ -125,6 +127,7 @@ func (r *Router) Build(mux *http.ServeMux) error {
 			return
 		}
 	})
+	mux.Handle("/metrics", promhttp.Handler())
 	return nil
 }
 

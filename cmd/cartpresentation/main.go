@@ -24,7 +24,7 @@ func main() {
 		itemStore v1.ItemStore = clientv1.NewItemClient(itemServiceURL)
 	)
 
-	err := router.DefaultRouter.Register(&v1.CartPresentationRouter{ItemStore: itemStore, CartStore: cartStore})
+	err := router.DefaultRouter.Register(v1.NewCartPresentationRouter(itemStore, cartStore))
 	if err != nil {
 		slog.Error("Failed to register cart presentation router", "error", err)
 		os.Exit(1)

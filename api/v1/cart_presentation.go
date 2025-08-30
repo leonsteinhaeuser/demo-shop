@@ -7,6 +7,7 @@ import (
 
 	"github.com/leonsteinhaeuser/demo-shop/internal/handlers"
 	"github.com/leonsteinhaeuser/demo-shop/internal/router"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type CartPresentation struct {
@@ -21,8 +22,29 @@ type CartItemPresentation struct {
 }
 
 type CartPresentationRouter struct {
-	ItemStore ItemStore
-	CartStore CartStore
+	ItemStore            ItemStore
+	CartStore            CartStore
+	processedGetRequests prometheus.Counter
+	processedGetFailures prometheus.Counter
+}
+
+func NewCartPresentationRouter(itemStore ItemStore, cartStore CartStore) *CartPresentationRouter {
+	return &CartPresentationRouter{
+		ItemStore: itemStore,
+		CartStore: cartStore,
+		processedGetRequests: prometheus.NewCounter(
+			prometheus.CounterOpts{
+				Name: "cartpresentation_get_processed_requests_total",
+				Help: "Total number of cart presentation get requests",
+			},
+		),
+		processedGetFailures: prometheus.NewCounter(
+			prometheus.CounterOpts{
+				Name: "cartpresentation_get_processed_failures_total",
+				Help: "Total number of cart presentation get request failures",
+			},
+		),
+	}
 }
 
 func (c *CartPresentationRouter) GetApiVersion() string {
@@ -48,24 +70,31 @@ func (c *CartPresentationRouter) Routes() []router.PathObject {
 }
 
 func (c *CartPresentationRouter) getCartPresentation(ctx context.Context, r *http.Request) (*CartPresentation, error) {
+	c.processedGetRequests.Inc()
+
 	if c.CartStore == nil {
+		c.processedGetFailures.Inc()
 		return nil, errors.New("cart store is not initialized")
 	}
 	if c.ItemStore == nil {
+		c.processedGetFailures.Inc()
 		return nil, errors.New("item store is not initialized")
 	}
 
 	cartID, err := handlers.GetUUIDFromPathValue(r, "id")
 	if err != nil {
+		c.processedGetFailures.Inc()
 		return nil, err
 	}
 
 	cart, err := c.CartStore.Get(ctx, cartID)
 	if err != nil {
+		c.processedGetFailures.Inc()
 		return nil, err
 	}
 
 	if cart == nil {
+		c.processedGetFailures.Inc()
 		return nil, errors.New("cart not found")
 	}
 
@@ -80,9 +109,11 @@ func (c *CartPresentationRouter) getCartPresentation(ctx context.Context, r *htt
 	for _, cartItem := range cart.Items {
 		item, err := c.ItemStore.Get(ctx, cartItem.ItemID)
 		if err != nil {
+			c.processedGetFailures.Inc()
 			return nil, err
 		}
 		if item == nil {
+			c.processedGetFailures.Inc()
 			return nil, errors.New("item not found for cart item")
 		}
 		// create CartItemPresentation

@@ -17,7 +17,7 @@ func main() {
 		userStore v1.UserStore = inmem.NewUserInMemStorage()
 	)
 
-	err := router.DefaultRouter.Register(&v1.UserRouter{UserStore: userStore})
+	err := router.DefaultRouter.Register(v1.NewUserRouter(userStore))
 	if err != nil {
 		slog.Error("Failed to register user router", "error", err)
 		os.Exit(1)
