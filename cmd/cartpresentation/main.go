@@ -25,6 +25,8 @@ var (
 )
 
 func main() {
+	slog.Info("Cart Presentation Service", "version", version, "commit", commit, "date", date)
+
 	mux := http.NewServeMux()
 
 	var (

@@ -19,6 +19,8 @@ var (
 )
 
 func main() {
+	slog.Info("Checkout Service", "version", version, "commit", commit, "date", date)
+
 	mux := http.NewServeMux()
 
 	var (
