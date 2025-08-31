@@ -2,7 +2,6 @@ package v1
 
 import (
 	"bytes"
-	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
@@ -53,18 +52,14 @@ type Gateway struct {
 }
 
 // NewGateway creates a new gateway instance
-func NewGateway(userServiceURL, cartServiceURL, itemServiceURL, checkoutServiceURL, cartPresentationServiceURL string) *Gateway {
-	// Generate a random cookie encryption key (in production, use a fixed key from config)
-	cookieKey := make([]byte, 32)
-	rand.Read(cookieKey)
-
+func NewGateway(userServiceURL, cartServiceURL, itemServiceURL, checkoutServiceURL, cartPresentationServiceURL string, cookieEncryptionKey []byte) *Gateway {
 	return &Gateway{
 		userServiceURL:             userServiceURL,
 		cartServiceURL:             cartServiceURL,
 		itemServiceURL:             itemServiceURL,
 		checkoutServiceURL:         checkoutServiceURL,
 		cartPresentationServiceURL: cartPresentationServiceURL,
-		cookieKey:                  cookieKey,
+		cookieKey:                  cookieEncryptionKey,
 	}
 }
 
@@ -199,7 +194,16 @@ func (g *Gateway) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		(&router.ErrorResponse{
+			Status:  http.StatusInternalServerError,
+			Path:    r.URL.Path,
+			Message: "failed to encode response",
+			Error:   err.Error(),
+		}).WriteTo(w)
+		return
+	}
 }
 
 // handleLogout processes logout requests
@@ -216,7 +220,16 @@ func (g *Gateway) handleLogout(w http.ResponseWriter, r *http.Request) {
 	})
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message":"logged out successfully"}`))
+	_, err := w.Write([]byte(`{"message":"logged out successfully"}`))
+	if err != nil {
+		(&router.ErrorResponse{
+			Status:  http.StatusInternalServerError,
+			Path:    r.URL.Path,
+			Message: "failed to write response",
+			Error:   err.Error(),
+		}).WriteTo(w)
+		return
+	}
 }
 
 // getUserByUsername fetches user details from the user service by username

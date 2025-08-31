@@ -9,3 +9,11 @@ func StringEnvOrDefault(key, defaultValue string) string {
 	}
 	return value
 }
+
+func BytesEnvOrDefault(key string, defaultValue []byte) []byte {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return []byte(value)
+}

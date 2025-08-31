@@ -8,6 +8,10 @@ import (
 	"testing"
 )
 
+var (
+	cookieEncryptionKey []byte = []byte("a_random_secret_key")
+)
+
 func TestGateway_HandleLogin(t *testing.T) {
 	gateway := NewGateway(
 		"http://localhost:8084", // userServiceURL
@@ -15,6 +19,7 @@ func TestGateway_HandleLogin(t *testing.T) {
 		"http://localhost:8081", // itemServiceURL
 		"http://localhost:8085", // checkoutServiceURL
 		"http://localhost:8083", // cartPresentationServiceURL
+		cookieEncryptionKey,
 	)
 
 	tests := []struct {
@@ -102,6 +107,7 @@ func TestGateway_HandleLogout(t *testing.T) {
 		"http://localhost:8081", // itemServiceURL
 		"http://localhost:8085", // checkoutServiceURL
 		"http://localhost:8083", // cartPresentationServiceURL
+		cookieEncryptionKey,
 	)
 
 	req := httptest.NewRequest(http.MethodPost, "/logout", nil)
@@ -130,6 +136,7 @@ func TestGateway_ServeHTTP(t *testing.T) {
 		"http://localhost:8081", // itemServiceURL
 		"http://localhost:8085", // checkoutServiceURL
 		"http://localhost:8083", // cartPresentationServiceURL
+		cookieEncryptionKey,
 	)
 
 	tests := []struct {
@@ -185,6 +192,7 @@ func TestGateway_ValidatePassword(t *testing.T) {
 		"http://localhost:8081", // itemServiceURL
 		"http://localhost:8085", // checkoutServiceURL
 		"http://localhost:8083", // cartPresentationServiceURL
+		cookieEncryptionKey,
 	)
 
 	tests := []struct {

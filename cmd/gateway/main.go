@@ -24,6 +24,7 @@ var (
 	envItemServiceURL             = env.StringEnvOrDefault("ITEM_SERVICE_URL", "http://localhost:8081")
 	envCheckoutServiceURL         = env.StringEnvOrDefault("CHECKOUT_SERVICE_URL", "http://localhost:8085")
 	envCartPresentationServiceURL = env.StringEnvOrDefault("CART_PRESENTATION_SERVICE_URL", "http://localhost:8083")
+	envCookieEncryptionKey        = env.BytesEnvOrDefault("COOKIE_ENCRYPTION_KEY", []byte("a_random_secret_key"))
 )
 
 func main() {
@@ -31,7 +32,7 @@ func main() {
 	slog.Info("API Gateway", "version", version, "commit", commit, "date", date)
 
 	// Initialize gateway
-	gateway := v1.NewGateway(envUserServiceURL, envCartServiceURL, envItemServiceURL, envCheckoutServiceURL, envCartPresentationServiceURL)
+	gateway := v1.NewGateway(envUserServiceURL, envCartServiceURL, envItemServiceURL, envCheckoutServiceURL, envCartPresentationServiceURL, envCookieEncryptionKey)
 
 	// Create multiplexer and register routes
 	mux := http.NewServeMux()
