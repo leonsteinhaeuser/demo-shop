@@ -2,13 +2,16 @@
 
 .PHONY: run down test lint build clean help
 
-## Docker operations
+## Podman operations
 run: ## Start the application with podman-compose
 	podman-compose up --build --force-recreate
 
-down: ## Stop and clean up docker containers
+rund: ## Start the application with podman-compose (detached mode)
+	podman-compose up --build --force-recreate -d
+
+down: ## Stop and clean up containers
 	podman-compose down --remove-orphans
-	podman rmi $(podman images -q --filter dangling=true) --force
+	podman rmi $(shell podman images -q --filter dangling=true) --force 2>/dev/null || true
 
 ## Development operations
 test: ## Run all tests with coverage
