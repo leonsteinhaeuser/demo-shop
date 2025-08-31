@@ -26,7 +26,7 @@ func TestGateway_HandleLogin(t *testing.T) {
 		{
 			name: "valid login request",
 			requestBody: LoginRequest{
-				Email:    "test@example.com",
+				Username: "testuser",
 				Password: "password123",
 			},
 			expectedStatus: http.StatusUnauthorized, // Will fail because user doesn't exist
@@ -43,7 +43,7 @@ func TestGateway_HandleLogin(t *testing.T) {
 		{
 			name: "missing password",
 			requestBody: LoginRequest{
-				Email: "test@example.com",
+				Username: "testuser",
 			},
 			expectedStatus: http.StatusBadRequest,
 			expectCookie:   false,
