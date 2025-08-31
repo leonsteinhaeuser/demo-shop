@@ -10,13 +10,15 @@ class Auth {
     init() {
         // Check for stored session
         const storedUser = localStorage.getItem('demo-shop-user');
+        const storedCartId = localStorage.getItem('demo-shop-cart-id');
         if (storedUser) {
             this.currentUser = JSON.parse(storedUser);
             this.isAuthenticated = true;
             this.updateUI();
 
             // Initialize cart for restored user session asynchronously
-            if (window.cart) {
+            if (window.cart && storedCartId) {
+                window.cart.cartId = storedCartId;
                 // Use setTimeout to ensure cart initialization happens after all synchronous initialization
                 setTimeout(async () => {
                     try {
@@ -77,41 +79,34 @@ class Auth {
         e.preventDefault();
         const formData = new FormData(e.target);
         const credentials = {
-            username: formData.get('username'),
+            username: formData.get('username') || formData.get('email'), // Support both username and email fields for compatibility
             password: formData.get('password')
         };
 
         try {
-            // For demo purposes, we'll simulate login
-            // In a real app, you'd validate against the user service
-            const users = await apiClient.getUsers();
-            const user = users.find(u => u.username === credentials.username);
+            // Use the gateway authentication endpoint
+            const response = await apiClient.login(credentials.username, credentials.password);
+            
+            this.currentUser = response.user;
+            this.isAuthenticated = true;
+            localStorage.setItem('demo-shop-user', JSON.stringify(response.user));
+            localStorage.setItem('demo-shop-cart-id', response.cart_id);
 
-            if (user) {
-                // Simulate password validation (in real app, this would be server-side)
-                this.currentUser = user;
-                this.isAuthenticated = true;
-                localStorage.setItem('demo-shop-user', JSON.stringify(user));
+            this.updateUI();
+            this.closeModals();
 
-                this.updateUI();
-                this.closeModals();
+            if (window.shop) {
+                window.shop.showToast('Login successful!', 'success');
+            }
 
-                if (window.shop) {
-                    window.shop.showToast('Login successful!', 'success');
-                }
-
-                // Initialize user's cart
-                if (window.cart) {
-                    await window.cart.initializeCart();
-                }
-            } else {
-                if (window.shop) {
-                    window.shop.showToast('Invalid username or password', 'error');
-                }
+            // Initialize user's cart with the cart ID from the login response
+            if (window.cart) {
+                window.cart.cartId = response.cart_id;
+                await window.cart.initializeCart();
             }
         } catch (error) {
             if (window.shop) {
-                window.shop.showToast('Login failed: ' + error.message, 'error');
+                window.shop.showToast('Invalid credentials', 'error');
             }
         }
     }
@@ -141,14 +136,23 @@ class Auth {
         }
     }
 
-    logout() {
+    async logout() {
         console.log('Logout started, cart items before logout:', window.cart?.items?.length || 0);
+
+        try {
+            // Call the gateway logout endpoint
+            await apiClient.logout();
+        } catch (error) {
+            console.error('Logout API call failed:', error);
+            // Continue with local logout even if API call fails
+        }
 
         this.currentUser = null;
         this.isAuthenticated = false;
         localStorage.removeItem('demo-shop-user');
+        localStorage.removeItem('demo-shop-cart-id');
 
-        // Clear cart UI only - don't clear cart data as it should persist in API
+        // Clear cart UI and data
         if (window.cart) {
             window.cart.items = [];
             window.cart.cartId = null;

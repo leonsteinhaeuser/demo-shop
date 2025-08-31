@@ -20,7 +20,8 @@ const API_ENDPOINTS = {
     users: '/api/v1/core/users',
     carts: '/api/v1/core/carts',
     checkouts: '/api/v1/core/checkouts',
-    cartPresentation: '/api/v1/presentation/cart'
+    cartPresentation: '/api/v1/presentation/cart',
+    auth: '/api/v1/auth'
 };
 
 // Build full URLs for each service
@@ -44,6 +45,11 @@ const API_SERVICES = {
     get cartPresentation() {
         const config = getAPIConfig();
         return config.CART_PRESENTATION_SERVICE_URL + API_ENDPOINTS.cartPresentation;
+    },
+    get auth() {
+        const config = getAPIConfig();
+        // Use any service URL for auth since they all point to the gateway
+        return config.ITEMS_SERVICE_URL + API_ENDPOINTS.auth;
     }
 };
 
@@ -54,6 +60,7 @@ class ApiClient {
                 'Content-Type': 'application/json',
                 ...options.headers,
             },
+            credentials: 'include', // Include cookies for session management
             ...options,
         };
 
@@ -78,6 +85,20 @@ class ApiClient {
             console.error('API request failed:', error);
             throw error;
         }
+    }
+
+    // Authentication API
+    async login(username, password) {
+        return this.request(`${API_SERVICES.auth}/login`, {
+            method: 'POST',
+            body: { username, password },
+        });
+    }
+
+    async logout() {
+        return this.request(`${API_SERVICES.auth}/logout`, {
+            method: 'POST',
+        });
     }
 
     // Items API
