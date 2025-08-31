@@ -1,0 +1,11 @@
+FROM golang:alpine AS builder
+WORKDIR /app
+ADD . .
+RUN go mod download && \
+    go build -o /tmp/gateway ./cmd/gateway/main.go
+
+# Final Stage
+FROM alpine:latest
+COPY --from=builder /tmp/gateway /usr/local/bin/gateway
+EXPOSE 8080
+CMD ["/usr/local/bin/gateway"]

@@ -133,8 +133,10 @@ func (r *Router) Build(mux *http.ServeMux) error {
 
 func EnableCorsHeader(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Allow requests from any origin
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		// Allow requests from frontend origin
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8088")
+		// Allow credentials for session management
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		// Allow specific HTTP methods
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")

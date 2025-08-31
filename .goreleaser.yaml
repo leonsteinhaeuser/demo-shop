@@ -96,6 +96,24 @@ builds:
       - -X main.commit={{.Commit}}
       - -X main.date={{.Date}}
 
+  - id: gateway
+    main: ./cmd/gateway
+    binary: gateway
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
 dockers:
   - id: cart-docker
     goos: linux
@@ -187,6 +205,26 @@ dockers:
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-user:v{{ .Version }}"
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-user:latest"
     dockerfile: cmd/user/Containerfile
+    extra_files:
+      - ./
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title=demo-shop-user"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+
+  - id: gateway-docker
+    goos: linux
+    goarch: amd64
+    use: buildx
+    ids:
+      - gateway
+    image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-gateway:v{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-gateway:latest"
+    dockerfile: cmd/gateway/Containerfile
     extra_files:
       - ./
     build_flag_templates:
