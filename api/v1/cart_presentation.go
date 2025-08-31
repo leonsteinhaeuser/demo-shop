@@ -48,7 +48,7 @@ func NewCartPresentationRouter(itemStore ItemStore, cartStore CartStore) *CartPr
 }
 
 func (c *CartPresentationRouter) GetApiVersion() string {
-	return "v1"
+	return version
 }
 
 func (c *CartPresentationRouter) GetGroup() string {

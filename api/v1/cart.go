@@ -95,11 +95,11 @@ func NewCartRouter(store CartStore) *CartRouter {
 }
 
 func (c *CartRouter) GetApiVersion() string {
-	return "v1"
+	return version
 }
 
 func (c *CartRouter) GetGroup() string {
-	return "core"
+	return group
 }
 
 func (c *CartRouter) GetKind() string {

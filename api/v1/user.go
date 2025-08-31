@@ -126,11 +126,11 @@ func NewUserRouter(userStore UserStore) *UserRouter {
 }
 
 func (u *UserRouter) GetApiVersion() string {
-	return "v1"
+	return version
 }
 
 func (u *UserRouter) GetGroup() string {
-	return "core"
+	return group
 }
 
 func (u *UserRouter) GetKind() string {

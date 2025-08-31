@@ -161,7 +161,7 @@ func HttpUpdate[T any](updateFunc func(context.Context, *http.Request, *T) error
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(obj); err != nil {
 			(&router.ErrorResponse{
 				Status:  http.StatusInternalServerError,
@@ -226,6 +226,6 @@ func HttpHealthz(readyCh <-chan bool) func(w http.ResponseWriter, r *http.Reques
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	}
 }

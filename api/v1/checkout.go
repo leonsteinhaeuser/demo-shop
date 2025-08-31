@@ -81,11 +81,11 @@ func NewCheckoutRouter(store CheckoutStore) *CheckoutRouter {
 }
 
 func (c *CheckoutRouter) GetApiVersion() string {
-	return "v1"
+	return version
 }
 
 func (c *CheckoutRouter) GetGroup() string {
-	return "core"
+	return group
 }
 
 func (c *CheckoutRouter) GetKind() string {
@@ -164,6 +164,11 @@ func (c *CheckoutRouter) updateCheckout(ctx context.Context, r *http.Request, ch
 
 func (c *CheckoutRouter) deleteCheckout(ctx context.Context, r *http.Request, checkout *Checkout) error {
 	c.processedDeleteRequests.Inc()
+
+	if checkout == nil {
+		c.processedDeleteFailures.Inc()
+		return errors.New("checkout cannot be nil")
+	}
 
 	err := c.Store.Delete(ctx, checkout.ID)
 	if err != nil {

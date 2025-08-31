@@ -98,11 +98,11 @@ func NewItemRouter(store ItemStore) *ItemRouter {
 }
 
 func (i *ItemRouter) GetApiVersion() string {
-	return "v1"
+	return version
 }
 
 func (i *ItemRouter) GetGroup() string {
-	return "core"
+	return group
 }
 
 func (i *ItemRouter) GetKind() string {
@@ -222,10 +222,24 @@ func (i *ItemRouter) updateItem(ctx context.Context, r *http.Request, item *Item
 		return errors.New("item store is not initialized")
 	}
 
-	if item.ID == uuid.Nil {
+	// Extract ID from URL path
+	id, err := handlers.GetUUIDFromPathValue(r, "id")
+	if err != nil {
 		i.processedUpdateFailures.Inc()
-		return errors.New("item ID cannot be empty")
+		return err
 	}
+
+	// Get the existing item to preserve created_at timestamp
+	existingItem, err := i.Store.Get(ctx, id)
+	if err != nil {
+		i.processedUpdateFailures.Inc()
+		return err
+	}
+
+	// Set the ID from the URL path and preserve created_at
+	item.ID = id
+	item.CreatedAt = existingItem.CreatedAt
+
 	if item.Name == "" {
 		i.processedUpdateFailures.Inc()
 		return errors.New("item name cannot be empty")
@@ -235,7 +249,10 @@ func (i *ItemRouter) updateItem(ctx context.Context, r *http.Request, item *Item
 		return errors.New("item price must be greater than zero")
 	}
 
-	err := i.Store.Update(ctx, item)
+	// Set update timestamp
+	item.UpdatedAt = time.Now()
+
+	err = i.Store.Update(ctx, item)
 	if err != nil {
 		i.processedUpdateFailures.Inc()
 		return err

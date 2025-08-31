@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
 	v1 "github.com/leonsteinhaeuser/demo-shop/api/v1"
 	clientv1 "github.com/leonsteinhaeuser/demo-shop/clients/v1"
@@ -36,7 +37,17 @@ func main() {
 		os.Exit(1)
 	}
 	slog.Info("Starting server on :8080")
-	if err := http.ListenAndServe(":8080", router.EnableCorsHeader(mux)); err != nil {
+
+	server := &http.Server{
+		Addr:           ":8080",
+		Handler:        router.EnableCorsHeader(mux),
+		ReadTimeout:    15 * time.Second,
+		WriteTimeout:   15 * time.Second,
+		IdleTimeout:    60 * time.Second,
+		MaxHeaderBytes: 1 << 20, // 1 MB
+	}
+
+	if err := server.ListenAndServe(); err != nil {
 		slog.Error("Failed to start server", "error", err)
 		os.Exit(1)
 	}
