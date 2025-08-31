@@ -100,12 +100,15 @@ dockers:
   - id: cart-docker
     goos: linux
     goarch: amd64
+    use: buildx
     ids:
       - cart
     image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cart:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cart:v{{ .Version }}"
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cart:latest"
     dockerfile: cmd/cart/Containerfile
+    extra_files:
+      - ./
     build_flag_templates:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -117,12 +120,15 @@ dockers:
   - id: cartpresentation-docker
     goos: linux
     goarch: amd64
+    use: buildx
     ids:
       - cartpresentation
     image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cartpresentation:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cartpresentation:v{{ .Version }}"
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cartpresentation:latest"
     dockerfile: cmd/cartpresentation/Containerfile
+    extra_files:
+      - ./
     build_flag_templates:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -134,12 +140,15 @@ dockers:
   - id: checkout-docker
     goos: linux
     goarch: amd64
+    use: buildx
     ids:
       - checkout
     image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-checkout:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-checkout:v{{ .Version }}"
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-checkout:latest"
     dockerfile: cmd/checkout/Containerfile
+    extra_files:
+      - ./
     build_flag_templates:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -151,12 +160,15 @@ dockers:
   - id: item-docker
     goos: linux
     goarch: amd64
+    use: buildx
     ids:
       - item
     image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-item:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-item:v{{ .Version }}"
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-item:latest"
     dockerfile: cmd/item/Containerfile
+    extra_files:
+      - ./
     build_flag_templates:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -168,12 +180,15 @@ dockers:
   - id: user-docker
     goos: linux
     goarch: amd64
+    use: buildx
     ids:
       - user
     image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-user:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-user:v{{ .Version }}"
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-user:latest"
     dockerfile: cmd/user/Containerfile
+    extra_files:
+      - ./
     build_flag_templates:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -183,10 +198,15 @@ dockers:
       - "--label=org.opencontainers.image.source={{.GitURL}}"
 
   - id: frontend-docker
+    goos: linux
+    goarch: amd64
+    use: buildx
     image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-frontend:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-frontend:v{{ .Version }}"
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-frontend:latest"
     dockerfile: frontend/Containerfile
+    extra_files:
+      - frontend/
     build_flag_templates:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -196,7 +216,7 @@ dockers:
       - "--label=org.opencontainers.image.source={{.GitURL}}"
 
 archives:
-  - format: tar.gz
+  - formats: tar.gz
     name_template: >-
       {{ .ProjectName }}_
       {{- title .Os }}_
@@ -206,13 +226,10 @@ archives:
       {{- if .Arm }}v{{ .Arm }}{{ end }}
     format_overrides:
       - goos: windows
-        format: zip
+        formats: zip
 
 checksum:
   name_template: 'checksums.txt'
-
-snapshot:
-  name_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
@@ -263,4 +280,4 @@ release:
   extra_files:
     - glob: ./compose.yaml
     - glob: ./README.md
-    - glob: ./LICENSE.md
+    - glob: ./LICENSE

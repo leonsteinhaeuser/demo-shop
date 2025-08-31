@@ -8,13 +8,13 @@ RUN apk add --no-cache gettext
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy frontend files
-COPY . /usr/share/nginx/html/
+COPY frontend/ /usr/share/nginx/html/
 
 # Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY frontend/nginx.conf /etc/nginx/nginx.conf
 
 # Copy and make executable the entrypoint script
-COPY ./docker-entrypoint.sh /docker-entrypoint.sh
+COPY frontend/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 # Expose port 80

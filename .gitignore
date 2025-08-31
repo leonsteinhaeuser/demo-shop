@@ -30,3 +30,9 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# ignore goreleaser build folder
+dist/
+
+# ignore direnv file
+.envrc

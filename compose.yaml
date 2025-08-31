@@ -65,8 +65,8 @@ services:
     hostname: frontend
     image: leonsteinhaeuser/demo-shop-frontend:dev
     build:
-      context: ./frontend
-      dockerfile: Containerfile
+      context: .
+      dockerfile: frontend/Containerfile
     ports:
       - "8088:80"
     environment:
