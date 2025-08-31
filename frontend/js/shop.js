@@ -102,15 +102,36 @@ class Shop {
                         ${product.quantity > 0 ? `${product.quantity} in stock` : 'Out of stock'}
                     </div>
                     <div class="product-actions">
-                        <button class="btn btn-primary" 
-                                onclick="shop.addToCart('${product.id}')"
-                                ${product.quantity <= 0 ? 'disabled' : ''}>
-                            <i class="fas fa-cart-plus"></i> Add to Cart
-                        </button>
+                        ${this.renderAddToCartButton(product)}
                     </div>
                 </div>
             </div>
         `).join('');
+    }
+
+    renderAddToCartButton(product) {
+        // Only show the button if user is authenticated
+        const isAuthenticated = window.auth && window.auth.isAuthenticated;
+        
+        if (!isAuthenticated) {
+            return `
+                <div class="login-prompt">
+                    <p class="text-muted">
+                        <i class="fas fa-lock"></i> 
+                        <a href="#" onclick="window.auth.showLoginModal()" class="login-link">Login</a> 
+                        to add items to cart
+                    </p>
+                </div>
+            `;
+        }
+        
+        return `
+            <button class="btn btn-primary" 
+                    onclick="shop.addToCart('${product.id}')"
+                    ${product.quantity <= 0 ? 'disabled' : ''}>
+                <i class="fas fa-cart-plus"></i> Add to Cart
+            </button>
+        `;
     }
 
     filterProducts() {

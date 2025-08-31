@@ -41,29 +41,49 @@ class Router {
         switch (path) {
             case '/':
                 this.showPage('shop-page');
-                this.highlightNav(0);
+                this.highlightNav();
                 if (window.shop) {
                     window.shop.loadProducts();
                 }
                 break;
             case '/cart':
-                this.showPage('cart-page');
-                this.highlightNav(1);
-                if (window.cart) {
-                    await window.cart.loadCart();
+                if (window.auth && window.auth.isAuthenticated) {
+                    this.showPage('cart-page');
+                    this.highlightNav();
+                    if (window.cart) {
+                        await window.cart.loadCart();
+                    }
+                } else {
+                    this.navigate('/');
+                    if (window.auth) {
+                        window.auth.showLoginModal();
+                    }
+                    if (window.shop) {
+                        window.shop.showToast('Please login to view your cart', 'warning');
+                    }
                 }
                 break;
             case '/profile':
-                this.showPage('profile-page');
-                this.highlightNav(2);
-                if (window.shop) {
-                    window.shop.loadProfile();
+                if (window.auth && window.auth.isAuthenticated) {
+                    this.showPage('profile-page');
+                    this.highlightNav();
+                    if (window.shop) {
+                        window.shop.loadProfile();
+                    }
+                } else {
+                    this.navigate('/');
+                    if (window.auth) {
+                        window.auth.showLoginModal();
+                    }
+                    if (window.shop) {
+                        window.shop.showToast('Please login to view your profile', 'warning');
+                    }
                 }
                 break;
             case '/shop/items':
                 if (window.auth && window.auth.isAdmin()) {
                     this.showPage('admin-items-page');
-                    this.highlightNav(3);
+                    this.highlightNav();
                     if (window.shop) {
                         window.shop.loadAdminItems();
                     }
@@ -88,9 +108,29 @@ class Router {
     }
 
     highlightNav(index) {
+        // Clear all active states
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        
+        // Set active state based on current path
         const navLinks = document.querySelectorAll('.nav-link');
-        if (navLinks[index]) {
-            navLinks[index].classList.add('active');
+        switch (this.currentPath) {
+            case '/':
+                if (navLinks[0]) navLinks[0].classList.add('active'); // Shop link
+                break;
+            case '/cart':
+                const cartLink = document.querySelector('a[onclick*="/cart"]');
+                if (cartLink) cartLink.classList.add('active');
+                break;
+            case '/profile':
+                const profileLink = document.querySelector('a[onclick*="/profile"]');
+                if (profileLink) profileLink.classList.add('active');
+                break;
+            case '/shop/items':
+                const adminLink = document.querySelector('a[onclick*="/shop/items"]');
+                if (adminLink) adminLink.classList.add('active');
+                break;
         }
     }
 }

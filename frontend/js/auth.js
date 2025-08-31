@@ -28,6 +28,9 @@ class Auth {
                     }
                 }, 100);
             }
+        } else {
+            // Ensure UI is updated for unauthenticated state
+            this.updateUI();
         }
 
         this.setupEventListeners();
@@ -104,6 +107,16 @@ class Auth {
                 window.cart.cartId = response.cart_id;
                 await window.cart.initializeCart();
             }
+            
+            // Re-render products to show/hide Add to Cart buttons
+            if (window.shop) {
+                window.shop.renderProducts();
+            }
+            
+            // Update navigation highlighting
+            if (window.router) {
+                window.router.highlightNav();
+            }
         } catch (error) {
             if (window.shop) {
                 window.shop.showToast('Invalid credentials', 'error');
@@ -171,34 +184,82 @@ class Auth {
         if (window.router.currentPath === '/shop/items') {
             window.router.navigate('/');
         }
+        
+        // Re-render products to show/hide Add to Cart buttons
+        if (window.shop) {
+            window.shop.renderProducts();
+        }
+        
+        // Update navigation highlighting
+        if (window.router) {
+            window.router.highlightNav();
+        }
     }
 
     updateUI() {
         const userName = document.getElementById('user-name');
         const loginBtn = document.getElementById('login-btn');
         const logoutBtn = document.getElementById('logout-btn');
-        const adminLink = document.getElementById('admin-link');
+        
+        // Get containers for dynamic navigation
+        const dynamicNavLinks = document.getElementById('dynamic-nav-links');
+        const adminNavLink = document.getElementById('admin-nav-link');
 
         if (this.isAuthenticated && this.currentUser) {
             userName.textContent = this.currentUser.preferred_name || this.currentUser.username || 'User';
             loginBtn.classList.add('hidden');
             logoutBtn.classList.remove('hidden');
 
-            // Show admin link if user has is_admin = true
-            if (this.isAdmin()) {
-                adminLink.classList.remove('hidden');
-                adminLink.classList.add('show');
-            } else {
-                adminLink.classList.add('hidden');
-                adminLink.classList.remove('show');
-            }
+            // Render authenticated user navigation
+            this.renderAuthenticatedNavigation(dynamicNavLinks, adminNavLink);
         } else {
             userName.textContent = 'Guest';
             loginBtn.classList.remove('hidden');
             logoutBtn.classList.add('hidden');
-            adminLink.classList.add('hidden');
-            adminLink.classList.remove('show');
+            
+            // Clear navigation for unauthenticated users
+            this.renderUnauthenticatedNavigation(dynamicNavLinks, adminNavLink);
         }
+    }
+
+    renderAuthenticatedNavigation(dynamicContainer, adminContainer) {
+        // Render cart and profile navigation
+        dynamicContainer.innerHTML = `
+            <li><a href="#" onclick="router.navigate('/cart')" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i> Cart
+                    <span id="cart-count" class="cart-count">0</span>
+                </a></li>
+            <li><a href="#" onclick="router.navigate('/profile')" class="nav-link">
+                    <i class="fas fa-user"></i> Profile
+                </a></li>
+        `;
+
+        // Render admin navigation if user is admin
+        if (this.isAdmin()) {
+            adminContainer.innerHTML = `
+                <li>
+                    <a href="#" onclick="router.navigate('/shop/items')" class="nav-link">
+                        <i class="fas fa-boxes"></i> Manage Items
+                    </a>
+                </li>
+            `;
+        } else {
+            adminContainer.innerHTML = '';
+        }
+
+        // Update cart count if cart exists
+        if (window.cart) {
+            // Use setTimeout to ensure DOM is updated before trying to update cart count
+            setTimeout(() => {
+                window.cart.updateCartCount();
+            }, 0);
+        }
+    }
+
+    renderUnauthenticatedNavigation(dynamicContainer, adminContainer) {
+        // Clear all dynamic navigation
+        dynamicContainer.innerHTML = '';
+        adminContainer.innerHTML = '';
     }
 
     isAdmin() {

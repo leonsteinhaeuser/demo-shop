@@ -22,18 +22,9 @@
                 <li><a href="#" onclick="router.navigate('/')" class="nav-link">
                         <i class="fas fa-home"></i> Shop
                     </a></li>
-                <li><a href="#" onclick="router.navigate('/cart')" class="nav-link">
-                        <i class="fas fa-shopping-cart"></i> Cart
-                        <span id="cart-count" class="cart-count">0</span>
-                    </a></li>
-                <li><a href="#" onclick="router.navigate('/profile')" class="nav-link">
-                        <i class="fas fa-user"></i> Profile
-                    </a></li>
-                <li id="admin-link" class="admin-only hidden">
-                    <a href="#" onclick="router.navigate('/shop/items')" class="nav-link">
-                        <i class="fas fa-boxes"></i> Manage Items
-                    </a>
-                </li>
+                <!-- Cart and Profile links will be dynamically rendered -->
+                <div id="dynamic-nav-links"></div>
+                <div id="admin-nav-link"></div>
             </ul>
             <div class="nav-user">
                 <div class="user-info">

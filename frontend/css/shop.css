@@ -228,6 +228,27 @@ body {
     gap: 0.5rem;
 }
 
+.login-prompt {
+    text-align: center;
+}
+
+.login-prompt p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.login-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
+
 /* Cart Page */
 .cart-container {
     display: grid;

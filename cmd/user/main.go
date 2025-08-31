@@ -26,12 +26,17 @@ func main() {
 	ctx, cf := context.WithCancel(context.Background())
 	defer cf()
 
-	tracer, shutdown, err := utils.NewTracerGrpc(ctx, traceConfig)
+	tracer, shutdown, err := utils.NewTracer(ctx, traceConfig)
 	if err != nil {
 		slog.Error("Failed to create tracer", "error", err)
 		os.Exit(1)
 	}
-	defer shutdown(ctx)
+	defer func() {
+		err := shutdown(ctx)
+		if err != nil {
+			slog.Error("Failed to shutdown tracer", "error", err)
+		}
+	}()
 	utils.DefaultTracer = tracer
 
 	slog.Info("User Service", "version", version, "commit", commit, "date", date)

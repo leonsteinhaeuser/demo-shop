@@ -9,6 +9,10 @@ import (
 
 	"github.com/google/uuid"
 	apiv1 "github.com/leonsteinhaeuser/demo-shop/api/v1"
+	"github.com/leonsteinhaeuser/demo-shop/internal/utils"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 // ItemClient implements the ItemStore interface by making HTTP requests to the API server
@@ -35,32 +39,40 @@ func NewItemClientWithHTTPClient(baseURL string, httpClient *http.Client) *ItemC
 
 // Create implements the ItemStore.Create method
 func (i *ItemClient) Create(ctx context.Context, item *apiv1.Item) error {
+	ctx, span := utils.SpanFromContext(ctx, "item.client.create")
+	defer span.End()
+
 	url := fmt.Sprintf("%s/api/v1/core/items", i.baseURL)
 
 	jsonData, err := json.Marshal(item)
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("failed to marshal item: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := i.httpClient.Do(req)
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("failed to make request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusCreated {
+		span.RecordError(fmt.Errorf("unexpected status code: %d", resp.StatusCode))
 		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	// Update the item with the response (which includes generated ID, timestamps, etc.)
 	var updatedItem apiv1.Item
 	if err := json.NewDecoder(resp.Body).Decode(&updatedItem); err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("failed to decode response: %w", err)
 	}
 
@@ -71,25 +83,32 @@ func (i *ItemClient) Create(ctx context.Context, item *apiv1.Item) error {
 
 // List implements the ItemStore.List method
 func (i *ItemClient) List(ctx context.Context, page, limit int) ([]apiv1.Item, error) {
+	ctx, span := utils.SpanFromContext(ctx, "item.client.list")
+	defer span.End()
+
 	url := fmt.Sprintf("%s/api/v1/core/items?page=%d&limit=%d", i.baseURL, page, limit)
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
+		span.RecordError(err)
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	resp, err := i.httpClient.Do(req)
 	if err != nil {
+		span.RecordError(err)
 		return nil, fmt.Errorf("failed to make request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		span.RecordError(fmt.Errorf("unexpected status code: %d", resp.StatusCode))
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	var items []apiv1.Item
 	if err := json.NewDecoder(resp.Body).Decode(&items); err != nil {
+		span.RecordError(err)
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
@@ -98,62 +117,88 @@ func (i *ItemClient) List(ctx context.Context, page, limit int) ([]apiv1.Item, e
 
 // Get implements the ItemStore.Get method
 func (i *ItemClient) Get(ctx context.Context, id uuid.UUID) (*apiv1.Item, error) {
+	ctx, span := utils.SpanFromContext(ctx, "item.client.get")
+	defer span.End()
+
 	url := fmt.Sprintf("%s/api/v1/core/items/%s", i.baseURL, id.String())
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
+		span.RecordError(err)
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
+	// Inject trace context into request headers
+	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
+
 	resp, err := i.httpClient.Do(req)
 	if err != nil {
+		span.RecordError(err)
 		return nil, fmt.Errorf("failed to make request: %w", err)
 	}
 	defer resp.Body.Close()
+
+	span.SetAttributes(attribute.Int("http.status_code", resp.StatusCode))
 
 	if resp.StatusCode == http.StatusNotFound {
 		return nil, nil
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		err := fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		span.RecordError(err)
+		return nil, err
 	}
 
 	var item apiv1.Item
 	if err := json.NewDecoder(resp.Body).Decode(&item); err != nil {
+		span.RecordError(err)
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
+
+	span.SetAttributes(
+		attribute.String("item.name", item.Name),
+		attribute.Float64("item.price", item.Price),
+	)
 
 	return &item, nil
 }
 
 // Update implements the ItemStore.Update method
 func (i *ItemClient) Update(ctx context.Context, item *apiv1.Item) error {
+	ctx, span := utils.SpanFromContext(ctx, "item.client.update")
+	defer span.End()
+
 	url := fmt.Sprintf("%s/api/v1/core/items/%s", i.baseURL, item.ID.String())
 
 	jsonData, err := json.Marshal(item)
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("failed to marshal item: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "PUT", url, bytes.NewBuffer(jsonData))
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := i.httpClient.Do(req)
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("failed to make request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		span.RecordError(fmt.Errorf("unexpected status code: %d", resp.StatusCode))
 		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	// Update the item with the response
 	var updatedItem apiv1.Item
 	if err := json.NewDecoder(resp.Body).Decode(&updatedItem); err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("failed to decode response: %w", err)
 	}
 
@@ -164,28 +209,35 @@ func (i *ItemClient) Update(ctx context.Context, item *apiv1.Item) error {
 
 // Delete implements the ItemStore.Delete method
 func (i *ItemClient) Delete(ctx context.Context, id uuid.UUID) error {
+	ctx, span := utils.SpanFromContext(ctx, "item.client.delete")
+	defer span.End()
+
 	url := fmt.Sprintf("%s/api/v1/core/items/%s", i.baseURL, id.String())
 
 	// Create a minimal item object for the delete request
 	deleteItem := apiv1.Item{ID: id}
 	jsonData, err := json.Marshal(deleteItem)
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("failed to marshal item: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "DELETE", url, bytes.NewBuffer(jsonData))
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := i.httpClient.Do(req)
 	if err != nil {
+		span.RecordError(err)
 		return fmt.Errorf("failed to make request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+		span.RecordError(fmt.Errorf("unexpected status code: %d", resp.StatusCode))
 		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 

@@ -2,12 +2,10 @@ package utils
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -68,86 +66,6 @@ type responseWriter struct {
 func (rw *responseWriter) WriteHeader(code int) {
 	rw.statusCode = code
 	rw.ResponseWriter.WriteHeader(code)
-}
-
-// StartSpan is a helper function to start a span with common attributes
-func StartSpan(ctx context.Context, operationName string, attributes ...attribute.KeyValue) (context.Context, trace.Span) {
-	tracer := otel.Tracer("demo-shop")
-	return tracer.Start(ctx, operationName, trace.WithAttributes(attributes...))
-}
-
-// AddSpanEvent adds an event to the current span if one exists
-func AddSpanEvent(ctx context.Context, name string, attributes ...attribute.KeyValue) {
-	span := trace.SpanFromContext(ctx)
-	if span.IsRecording() {
-		span.AddEvent(name, trace.WithAttributes(attributes...))
-	}
-}
-
-// SetSpanError records an error on the current span if one exists
-func SetSpanError(ctx context.Context, err error) {
-	span := trace.SpanFromContext(ctx)
-	if span.IsRecording() {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-	}
-}
-
-// TracedHTTPClient creates an HTTP client that automatically propagates trace context
-func TracedHTTPClient() *http.Client {
-	return &http.Client{
-		Transport: &tracedTransport{
-			base: http.DefaultTransport,
-		},
-	}
-}
-
-// tracedTransport wraps an HTTP transport to inject trace context
-type tracedTransport struct {
-	base http.RoundTripper
-}
-
-func (t *tracedTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	// Create a new span for the outgoing HTTP request
-	ctx := req.Context()
-	tracer := otel.Tracer("demo-shop-http-client")
-
-	ctx, span := tracer.Start(ctx, "HTTP "+req.Method,
-		trace.WithAttributes(
-			attribute.String("http.method", req.Method),
-			attribute.String("http.url", req.URL.String()),
-			attribute.String("http.scheme", req.URL.Scheme),
-			attribute.String("http.host", req.URL.Host),
-			attribute.String("component", "http-client"),
-		),
-	)
-	defer span.End()
-
-	// Inject trace context into the outgoing request
-	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
-
-	// Update request with traced context
-	req = req.WithContext(ctx)
-
-	// Make the actual HTTP request
-	resp, err := t.base.RoundTrip(req)
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		return resp, err
-	}
-
-	// Add response attributes
-	span.SetAttributes(
-		attribute.Int("http.status_code", resp.StatusCode),
-	)
-
-	// Set span status based on HTTP status code
-	if resp.StatusCode >= 400 {
-		span.SetStatus(codes.Error, fmt.Sprintf("HTTP %d", resp.StatusCode))
-	}
-
-	return resp, nil
 }
 
 // InjectTraceHeaders manually injects trace context into HTTP headers

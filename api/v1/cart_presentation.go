@@ -7,6 +7,7 @@ import (
 
 	"github.com/leonsteinhaeuser/demo-shop/internal/handlers"
 	"github.com/leonsteinhaeuser/demo-shop/internal/router"
+	"github.com/leonsteinhaeuser/demo-shop/internal/utils"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -70,35 +71,44 @@ func (c *CartPresentationRouter) Routes() []router.PathObject {
 }
 
 func (c *CartPresentationRouter) getCartPresentation(ctx context.Context, r *http.Request) (*CartPresentation, error) {
+	ctx, span := utils.SpanFromContext(ctx, "cart_presentation.http.get")
+	defer span.End()
+
 	c.processedGetRequests.Inc()
 
 	if c.CartStore == nil {
+		span.RecordError(errors.New("cart store is not initialized"))
 		c.processedGetFailures.Inc()
 		return nil, errors.New("cart store is not initialized")
 	}
 	if c.ItemStore == nil {
+		span.RecordError(errors.New("item store is not initialized"))
 		c.processedGetFailures.Inc()
 		return nil, errors.New("item store is not initialized")
 	}
 
 	cartID, err := handlers.GetUUIDFromPathValue(r, "id")
 	if err != nil {
+		span.RecordError(err)
 		c.processedGetFailures.Inc()
 		return nil, err
 	}
 
 	cart, err := c.CartStore.Get(ctx, cartID)
 	if err != nil {
+		span.RecordError(err)
 		c.processedGetFailures.Inc()
 		return nil, err
 	}
 
 	if cart == nil {
+		span.RecordError(errors.New("cart not found"))
 		c.processedGetFailures.Inc()
 		return nil, errors.New("cart not found")
 	}
 
 	if len(cart.Items) == 0 {
+		span.RecordError(errors.New("cart is empty"))
 		return &CartPresentation{Items: []CartItemPresentation{}, TotalPrice: 0.0}, nil
 	}
 

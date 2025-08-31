@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	DefaultTracer trace.Tracer
+	DefaultTracer trace.Tracer = otel.Tracer("demo-shop-default")
 )
 
 // TracerConfig holds configuration for the tracer setup
@@ -27,6 +27,7 @@ type TracerConfig struct {
 	Endpoint       string
 	Insecure       bool
 	Headers        map[string]string
+	TracerProtocol string
 }
 
 func TraceConfigFromEnv() TracerConfig {
@@ -36,6 +37,7 @@ func TraceConfigFromEnv() TracerConfig {
 		Endpoint:       env.StringEnvOrDefault("TRACING_ENDPOINT", "http://localhost:4318"),
 		Insecure:       env.BoolEnvOrDefault("TRACING_INSECURE", true),
 		Headers:        env.MapEnvOrDefault("TRACING_HEADERS", nil),
+		TracerProtocol: env.StringEnvOrDefault("TRACING_PROTOCOL", "grpc"),
 	}
 }
 
@@ -88,6 +90,9 @@ func NewTracerGrpc(ctx context.Context, config TracerConfig) (trace.Tracer, func
 
 	// Create tracer
 	tracer := otel.Tracer(config.ServiceName)
+
+	// Set as default tracer
+	DefaultTracer = tracer
 
 	// Return shutdown function
 	shutdown := func(ctx context.Context) error {
@@ -149,6 +154,9 @@ func NewTracerHttp(ctx context.Context, config TracerConfig) (trace.Tracer, func
 	// Create tracer
 	tracer := otel.Tracer(config.ServiceName)
 
+	// Set as default tracer
+	DefaultTracer = tracer
+
 	// Return shutdown function
 	shutdown := func(ctx context.Context) error {
 		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -159,14 +167,20 @@ func NewTracerHttp(ctx context.Context, config TracerConfig) (trace.Tracer, func
 	return tracer, shutdown, nil
 }
 
-// NewTracer creates a new tracer based on protocol (http or grpc)
-func NewTracer(ctx context.Context, protocol string, config TracerConfig) (trace.Tracer, func(context.Context) error, error) {
-	switch protocol {
+// NewTracer creates a new tracer based on protocol from config
+func NewTracer(ctx context.Context, config TracerConfig) (trace.Tracer, func(context.Context) error, error) {
+	switch config.TracerProtocol {
 	case "grpc":
 		return NewTracerGrpc(ctx, config)
 	case "http":
 		return NewTracerHttp(ctx, config)
 	default:
-		return nil, nil, fmt.Errorf("unsupported protocol: %s, supported protocols are 'http' and 'grpc'", protocol)
+		return nil, nil, fmt.Errorf("unsupported protocol: %s, supported protocols are 'http' and 'grpc'", config.TracerProtocol)
 	}
+}
+
+// SpanFromContext creates a new child span from context
+// The "DefaultTracer" is used to create the span
+func SpanFromContext(ctx context.Context, name string) (context.Context, trace.Span) {
+	return DefaultTracer.Start(ctx, name)
 }

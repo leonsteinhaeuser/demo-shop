@@ -49,13 +49,19 @@ class Cart {
         }
 
         try {
-            const user = window.auth.getCurrentUser();
-            console.log('Initializing cart for user:', user);
+            // Get cart ID from localStorage (set during login)
+            const storedCartId = localStorage.getItem('demo-shop-cart-id');
 
-            if (user && user.id) {
-                // Try to find an existing cart for the user
-                await this.loadCartFromAPI(user.id);
+            if (storedCartId) {
+                this.cartId = storedCartId;
+                console.log('Using cart ID from login:', this.cartId);
+
+                // Load the cart using the cart_id from login response
+                await this.loadCartFromAPI(this.cartId);
                 console.log('Cart loaded successfully, items:', this.items.length);
+            } else {
+                console.log('No cart ID found, creating new cart');
+                await this.createNewCart();
             }
         } catch (error) {
             console.error('Error initializing cart:', error);
@@ -66,26 +72,40 @@ class Cart {
         this.updateCartCount();
     }
 
-    async loadCartFromAPI(userId) {
+    async loadCartFromAPI(cartId) {
         try {
-            // For demo purposes, we'll use a predictable cart ID based on user ID
-            // In a real app, you might have a separate endpoint to get cart by user ID
-            const cartId = userId; // Use the user ID directly as cart ID
-            console.log('Loading cart from API with ID:', cartId);
+            console.log('Loading cart presentation from API with ID:', cartId);
 
-            const cart = await apiClient.getCart(cartId);
-            console.log('Cart loaded from API:', cart);
+            // Use cart presentation service to get fully populated cart with items and total
+            const cartPresentation = await apiClient.getCartPresentation(cartId);
+            console.log('Cart presentation loaded from API:', cartPresentation);
 
-            if (cart && cart.items) {
-                this.cartId = cart.id;
-                this.items = await this.populateCartItems(cart.items || []);
-                console.log('Cart items populated:', this.items);
+            if (cartPresentation && cartPresentation.items && cartPresentation.items.length > 0) {
+                this.cartId = cartId;
+                // Convert cart presentation items to our internal format
+                this.items = cartPresentation.items.map(cartItem => ({
+                    ...cartItem.item,
+                    quantity: cartItem.quantity
+                }));
+                // Store the total price from the service (we can use this for validation)
+                this.serverTotalPrice = cartPresentation.total_price;
+                console.log('Cart items loaded from presentation service:', {
+                    itemCount: this.items.length,
+                    serverTotal: this.serverTotalPrice,
+                    items: this.items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.price }))
+                });
+            } else if (cartPresentation && cartPresentation.items && cartPresentation.items.length === 0) {
+                // Cart exists but is empty
+                this.cartId = cartId;
+                this.items = [];
+                this.serverTotalPrice = 0;
+                console.log('Cart found but is empty');
             } else {
-                console.log('No existing cart found or cart has no items, creating new cart');
+                console.log('No existing cart found, creating new cart');
                 await this.createNewCart();
             }
         } catch (error) {
-            console.error('Error loading cart from API:', error);
+            console.error('Error loading cart presentation from API:', error);
             // If the cart doesn't exist (create a new one)
             const errorMsg = error.message.toLowerCase();
             if (errorMsg.includes('404') || errorMsg.includes('not found') || errorMsg.includes('cart not found')) {
@@ -96,26 +116,6 @@ class Cart {
                 this.loadCartFromStorage();
             }
         }
-    }
-
-    async populateCartItems(cartItems) {
-        const populatedItems = [];
-
-        for (const cartItem of cartItems) {
-            try {
-                const item = await apiClient.getItem(cartItem.item_id);
-                if (item) {
-                    populatedItems.push({
-                        ...item,
-                        quantity: cartItem.quantity
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading item:', cartItem.item_id, error);
-            }
-        }
-
-        return populatedItems;
     }
 
     async createNewCart() {
@@ -130,8 +130,12 @@ class Cart {
                 return;
             }
 
+            // Use the cart ID from localStorage if available, otherwise generate one
+            const storedCartId = localStorage.getItem('demo-shop-cart-id');
+            const cartId = storedCartId || user.id; // Fallback to user.id if no cart_id stored
+
             const cartData = {
-                id: user.id, // Use user ID as cart ID for simplicity
+                id: cartId,
                 owner_id: user.id,
                 items: []
             };
@@ -142,14 +146,17 @@ class Cart {
 
             this.cartId = createdCart.id;
             this.items = [];
+            
+            // Store the cart ID for future use
+            localStorage.setItem('demo-shop-cart-id', this.cartId);
         } catch (error) {
             console.error('Error creating new cart:', error);
             // Fallback to local storage
-            const user = window.auth.getCurrentUser();
-            if (user && user.id) {
-                this.cartId = `local-cart-${user.id}`;
+            const storedCartId = localStorage.getItem('demo-shop-cart-id');
+            if (storedCartId) {
+                this.cartId = storedCartId;
                 this.items = [];
-                console.log('Using local cart as fallback:', this.cartId);
+                console.log('Using stored cart ID as fallback:', this.cartId);
             }
         }
     }
@@ -242,7 +249,29 @@ class Cart {
     }
 
     getTotal() {
-        return this.getSubtotal() + this.getTax();
+        const clientTotal = this.getSubtotal() + this.getTax();
+        
+        // Validate against server total if available
+        if (this.serverTotalPrice !== undefined) {
+            const serverSubtotal = this.serverTotalPrice;
+            const serverTotal = serverSubtotal + (serverSubtotal * this.taxRate);
+            
+            // Log discrepancy if there's a significant difference (more than 1 cent)
+            const difference = Math.abs(clientTotal - serverTotal);
+            if (difference > 0.01) {
+                console.warn('Cart total discrepancy detected:', {
+                    clientTotal: clientTotal.toFixed(2),
+                    serverTotal: serverTotal.toFixed(2),
+                    difference: difference.toFixed(2)
+                });
+            }
+        }
+        
+        return clientTotal;
+    }
+
+    getServerSubtotal() {
+        return this.serverTotalPrice || this.getSubtotal();
     }
 
     updateCartCount() {
@@ -258,10 +287,14 @@ class Cart {
         // First, refresh cart data from API if user is authenticated
         if (window.auth && window.auth.isAuthenticated) {
             try {
-                const user = window.auth.getCurrentUser();
-                if (user && user.id) {
-                    console.log('Refreshing cart from API for user:', user.id);
-                    await this.loadCartFromAPI(user.id);
+                // Use the stored cart ID instead of user ID
+                const storedCartId = localStorage.getItem('demo-shop-cart-id');
+                if (storedCartId) {
+                    console.log('Refreshing cart from API with cart ID:', storedCartId);
+                    await this.loadCartFromAPI(storedCartId);
+                } else {
+                    console.log('No cart ID found, initializing cart');
+                    await this.initializeCart();
                 }
             } catch (error) {
                 console.error('Error refreshing cart from API:', error);
@@ -329,6 +362,12 @@ class Cart {
 
         if (subtotalElement) {
             subtotalElement.textContent = `$${this.getSubtotal().toFixed(2)}`;
+            
+            // Add server subtotal for comparison in development
+            if (this.serverTotalPrice !== undefined && window.location.hostname === 'localhost') {
+                const serverSubtotal = this.serverTotalPrice;
+                subtotalElement.title = `Server subtotal: $${serverSubtotal.toFixed(2)}`;
+            }
         }
         if (taxElement) {
             taxElement.textContent = `$${this.getTax().toFixed(2)}`;
@@ -415,23 +454,17 @@ class Cart {
 
     saveCartToStorage() {
         // Fallback for offline functionality
-        if (window.auth.isAuthenticated) {
-            const user = window.auth.getCurrentUser();
-            if (user && user.id) {
-                localStorage.setItem(`cart-${user.id}`, JSON.stringify(this.items));
-            }
+        if (window.auth.isAuthenticated && this.cartId) {
+            localStorage.setItem(`cart-${this.cartId}`, JSON.stringify(this.items));
         }
     }
 
     loadCartFromStorage() {
         // Fallback for offline functionality
-        if (window.auth.isAuthenticated) {
-            const user = window.auth.getCurrentUser();
-            if (user && user.id) {
-                const storedCart = localStorage.getItem(`cart-${user.id}`);
-                if (storedCart) {
-                    this.items = JSON.parse(storedCart);
-                }
+        if (window.auth.isAuthenticated && this.cartId) {
+            const storedCart = localStorage.getItem(`cart-${this.cartId}`);
+            if (storedCart) {
+                this.items = JSON.parse(storedCart);
             }
         }
     }
