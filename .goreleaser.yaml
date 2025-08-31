@@ -1,0 +1,266 @@
+project_name: demo-shop
+
+before:
+  hooks:
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: cart
+    main: ./cmd/cart
+    binary: cart
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+  - id: cartpresentation
+    main: ./cmd/cartpresentation
+    binary: cartpresentation
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+  - id: checkout
+    main: ./cmd/checkout
+    binary: checkout
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+  - id: item
+    main: ./cmd/item
+    binary: item
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+  - id: user
+    main: ./cmd/user
+    binary: user
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+dockers:
+  - id: cart-docker
+    goos: linux
+    goarch: amd64
+    ids:
+      - cart
+    image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cart:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cart:latest"
+    dockerfile: cmd/cart/Containerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title=demo-shop-cart"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+
+  - id: cartpresentation-docker
+    goos: linux
+    goarch: amd64
+    ids:
+      - cartpresentation
+    image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cartpresentation:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cartpresentation:latest"
+    dockerfile: cmd/cartpresentation/Containerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title=demo-shop-cartpresentation"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+
+  - id: checkout-docker
+    goos: linux
+    goarch: amd64
+    ids:
+      - checkout
+    image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-checkout:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-checkout:latest"
+    dockerfile: cmd/checkout/Containerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title=demo-shop-checkout"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+
+  - id: item-docker
+    goos: linux
+    goarch: amd64
+    ids:
+      - item
+    image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-item:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-item:latest"
+    dockerfile: cmd/item/Containerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title=demo-shop-item"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+
+  - id: user-docker
+    goos: linux
+    goarch: amd64
+    ids:
+      - user
+    image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-user:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-user:latest"
+    dockerfile: cmd/user/Containerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title=demo-shop-user"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+
+  - id: frontend-docker
+    image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-frontend:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-frontend:latest"
+    dockerfile: frontend/Containerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title=demo-shop-frontend"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - '^build:'
+  groups:
+    - title: 'New Features'
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: 'Bug Fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: 'Performance Improvements'
+      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: 'Others'
+      order: 999
+
+release:
+  github:
+    owner: leonsteinhaeuser
+    name: demo-shop
+  header: |
+    ## Release {{ .Tag }}
+
+    Welcome to this new release of Demo Shop!
+  footer: |
+    ## Docker Images
+
+    Docker images are available on GitHub Container Registry:
+
+    ```bash
+    docker pull ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cart:{{ .Tag }}
+    docker pull ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-cartpresentation:{{ .Tag }}
+    docker pull ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-checkout:{{ .Tag }}
+    docker pull ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-item:{{ .Tag }}
+    docker pull ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-user:{{ .Tag }}
+    docker pull ghcr.io/{{ .Env.GITHUB_REPOSITORY }}-frontend:{{ .Tag }}
+    ```
+
+    ### Full Changelog: {{ .PreviousTag }}...{{ .Tag }}
+
+  extra_files:
+    - glob: ./compose.yaml
+    - glob: ./README.md
+    - glob: ./LICENSE.md

@@ -12,6 +12,13 @@ import (
 	"github.com/leonsteinhaeuser/demo-shop/internal/router"
 )
 
+// build information
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 var (
 	cartServiceURL = env.StringEnvOrDefault("CART_SERVICE_URL", "http://localhost:8080")
 	itemServiceURL = env.StringEnvOrDefault("ITEM_SERVICE_URL", "http://localhost:8080")

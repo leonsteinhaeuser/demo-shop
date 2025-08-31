@@ -11,6 +11,13 @@ import (
 	"github.com/leonsteinhaeuser/demo-shop/internal/storage/inmem"
 )
 
+// build information
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func main() {
 	mux := http.NewServeMux()
 
