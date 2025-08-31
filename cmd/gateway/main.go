@@ -1,14 +1,16 @@
 package main
 
 import (
-	"log"
+	"context"
 	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	v1 "github.com/leonsteinhaeuser/demo-shop/api/v1"
 	"github.com/leonsteinhaeuser/demo-shop/internal/env"
 	"github.com/leonsteinhaeuser/demo-shop/internal/router"
+	"github.com/leonsteinhaeuser/demo-shop/internal/utils"
 )
 
 // Build information set by GoReleaser
@@ -25,9 +27,22 @@ var (
 	envCheckoutServiceURL         = env.StringEnvOrDefault("CHECKOUT_SERVICE_URL", "http://localhost:8085")
 	envCartPresentationServiceURL = env.StringEnvOrDefault("CART_PRESENTATION_SERVICE_URL", "http://localhost:8083")
 	envCookieEncryptionKey        = env.BytesEnvOrDefault("COOKIE_ENCRYPTION_KEY", []byte("a_random_secret_key"))
+
+	traceConfig = utils.TraceConfigFromEnv()
 )
 
 func main() {
+	ctx, cf := context.WithCancel(context.Background())
+	defer cf()
+
+	tracer, shutdown, err := utils.NewTracerGrpc(ctx, traceConfig)
+	if err != nil {
+		slog.Error("Failed to create tracer", "error", err)
+		os.Exit(1)
+	}
+	defer shutdown(ctx)
+	utils.DefaultTracer = tracer
+
 	// Print build information
 	slog.Info("API Gateway", "version", version, "commit", commit, "date", date)
 
@@ -41,15 +56,27 @@ func main() {
 	// Configure server with timeouts
 	server := &http.Server{
 		Addr:           ":8080",
-		Handler:        router.EnableCorsHeader(mux),
+		Handler:        router.EnableCorsHeader(utils.TracingMiddleware("gateway")(mux)),
 		ReadTimeout:    30 * time.Second,
 		WriteTimeout:   30 * time.Second,
 		IdleTimeout:    60 * time.Second,
 		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
 
-	log.Println("API Gateway starting on :8080")
-	if err := server.ListenAndServe(); err != nil {
-		log.Fatal(err)
-	}
+	utils.StopSignalHandler(
+		func(ctx context.Context) {
+			slog.Info("API Gateway listening on :8080")
+			if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				slog.Error("Failed to start server", "error", err)
+				ctx.Done()
+			}
+		},
+		func(ctx context.Context) {
+			slog.Info("API Gateway shutting down...")
+			if err := server.Shutdown(ctx); err != nil {
+				slog.Error("Server forced to shutdown", "error", err)
+			}
+		},
+	)
+	slog.Warn("Server stopped")
 }

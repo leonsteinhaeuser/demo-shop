@@ -5,6 +5,7 @@ RUN go mod download && \
     go build -o /tmp/item ./cmd/item/main.go
 
 FROM alpine:latest AS final
+ENV SERVICE_NAME="item"
 COPY --from=builder /tmp/item /usr/local/bin/item
 EXPOSE 8080
 ENTRYPOINT /usr/local/bin/item

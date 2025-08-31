@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"github.com/leonsteinhaeuser/demo-shop/internal/router"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 const (
@@ -433,6 +435,12 @@ func (g *Gateway) proxyToService(w http.ResponseWriter, r *http.Request) {
 	originalDirector := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		originalDirector(req)
+
+		// Propagate trace context to backend services
+		if r.Context() != nil {
+			// Use OpenTelemetry propagator to inject trace context into outgoing request
+			otel.GetTextMapPropagator().Inject(r.Context(), propagation.HeaderCarrier(req.Header))
+		}
 
 		// Add session data to headers if available
 		if sessionData, err := g.getSessionData(r); err == nil {

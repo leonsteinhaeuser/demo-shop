@@ -5,6 +5,7 @@ RUN go mod download && \
     go build -o /tmp/cart ./cmd/cart/main.go
 
 FROM alpine:latest AS final
+ENV SERVICE_NAME="cart"
 COPY --from=builder /tmp/cart /usr/local/bin/cart
 EXPOSE 8080
 ENTRYPOINT /usr/local/bin/cart

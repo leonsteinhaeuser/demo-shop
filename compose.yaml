@@ -6,6 +6,12 @@ services:
     build:
       context: .
       dockerfile: cmd/item/Containerfile
+    depends_on:
+      - jaeger
+    environment:
+      TRACING_SERVICE_VERSION: "dev"
+      TRACING_ENDPOINT: "jaeger:4317"
+      TRACING_INSECURE: "true"
     networks:
       - appnet
   cart:
@@ -15,6 +21,12 @@ services:
     build:
       context: .
       dockerfile: cmd/cart/Containerfile
+    depends_on:
+      - jaeger
+    environment:
+      TRACING_SERVICE_VERSION: "dev"
+      TRACING_ENDPOINT: "jaeger:4317"
+      TRACING_INSECURE: "true"
     networks:
       - appnet
   cartpresentation:
@@ -24,9 +36,14 @@ services:
     build:
       context: .
       dockerfile: cmd/cartpresentation/Containerfile
+    depends_on:
+      - jaeger
     environment:
       CART_SERVICE_URL: "http://cart:8080"
       ITEM_SERVICE_URL: "http://item:8080"
+      TRACING_SERVICE_VERSION: "dev"
+      TRACING_ENDPOINT: "jaeger:4317"
+      TRACING_INSECURE: "true"
     networks:
       - appnet
   user:
@@ -36,6 +53,12 @@ services:
     build:
       context: .
       dockerfile: cmd/user/Containerfile
+    depends_on:
+      - jaeger
+    environment:
+      TRACING_SERVICE_VERSION: "dev"
+      TRACING_ENDPOINT: "jaeger:4317"
+      TRACING_INSECURE: "true"
     networks:
       - appnet
   checkout:
@@ -45,9 +68,14 @@ services:
     build:
       context: .
       dockerfile: cmd/checkout/Containerfile
+    depends_on:
+      - jaeger
     environment:
       CART_SERVICE_URL: "http://cart:8080"
       ITEM_SERVICE_URL: "http://item:8080"
+      TRACING_SERVICE_VERSION: "dev"
+      TRACING_ENDPOINT: "jaeger:4317"
+      TRACING_INSECURE: "true"
     networks:
       - appnet
   gateway:
@@ -57,6 +85,13 @@ services:
     build:
       context: .
       dockerfile: cmd/gateway/Containerfile
+    depends_on:
+      - item
+      - cart
+      - cartpresentation
+      - user
+      - checkout
+      - jaeger
     environment:
       USER_SERVICE_URL: "http://user:8080"
       CART_SERVICE_URL: "http://cart:8080"
@@ -64,14 +99,11 @@ services:
       CHECKOUT_SERVICE_URL: "http://checkout:8080"
       CART_PRESENTATION_SERVICE_URL: "http://cartpresentation:8080"
       COOKIE_ENCRYPTION_KEY: "a_random_secret_key"
+      TRACING_SERVICE_VERSION: "dev"
+      TRACING_ENDPOINT: "jaeger:4317"
+      TRACING_INSECURE: "true"
     ports:
       - "8080:8080"
-    depends_on:
-      - item
-      - cart
-      - cartpresentation
-      - user
-      - checkout
     networks:
       - appnet
   frontend:
@@ -92,6 +124,18 @@ services:
       - CART_PRESENTATION_SERVICE_URL=http://localhost:8080
     depends_on:
       - gateway
+
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      # - "4317:4317"
+      # - "4318:4318"
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    networks:
+      - appnet
 
 networks:
   appnet:

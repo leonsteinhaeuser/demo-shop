@@ -6,6 +6,7 @@ RUN go mod download && \
 
 # Final Stage
 FROM alpine:latest
+ENV SERVICE_NAME="gateway"
 COPY --from=builder /tmp/gateway /usr/local/bin/gateway
 EXPOSE 8080
 CMD ["/usr/local/bin/gateway"]
