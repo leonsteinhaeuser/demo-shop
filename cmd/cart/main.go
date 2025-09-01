@@ -62,7 +62,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:           ":8080",
-		Handler:        router.EnableCorsHeader(utils.TracingMiddleware("cart")(mux)),
+		Handler:        utils.LogMiddleware(router.EnableCorsHeader(utils.TracingMiddleware("cart")(mux))),
 		ReadTimeout:    15 * time.Second,
 		WriteTimeout:   15 * time.Second,
 		IdleTimeout:    60 * time.Second,

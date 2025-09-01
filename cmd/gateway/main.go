@@ -8,6 +8,7 @@ import (
 	"time"
 
 	v1 "github.com/leonsteinhaeuser/demo-shop/api/v1"
+	"github.com/leonsteinhaeuser/demo-shop/cmd/gateway/check"
 	"github.com/leonsteinhaeuser/demo-shop/internal/env"
 	"github.com/leonsteinhaeuser/demo-shop/internal/router"
 	"github.com/leonsteinhaeuser/demo-shop/internal/utils"
@@ -34,6 +35,15 @@ var (
 func main() {
 	ctx, cf := context.WithCancel(context.Background())
 	defer cf()
+
+	// ping upstream services
+	check.Check(ctx,
+		envUserServiceURL,
+		envCartServiceURL,
+		envItemServiceURL,
+		envCheckoutServiceURL,
+		envCartPresentationServiceURL,
+	)
 
 	tracer, shutdown, err := utils.NewTracer(ctx, traceConfig)
 	if err != nil {
@@ -73,7 +83,7 @@ func main() {
 	// Configure server with timeouts
 	server := &http.Server{
 		Addr:           ":8080",
-		Handler:        router.EnableCorsHeader(utils.TracingMiddleware("gateway")(mux)),
+		Handler:        utils.LogMiddleware(router.EnableCorsHeader(utils.TracingMiddleware("gateway")(mux))),
 		ReadTimeout:    30 * time.Second,
 		WriteTimeout:   30 * time.Second,
 		IdleTimeout:    60 * time.Second,
