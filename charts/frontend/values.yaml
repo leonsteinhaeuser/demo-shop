@@ -104,6 +104,10 @@ affinity: {}
 upstreamServiceUrls:
   gatewayService: http://gateway:8080
 
+openshift:
+  scc:
+    enabled: true
+
 # Pod Disruption Budget configuration
 podDisruptionBudget:
   enabled: false
