@@ -56,6 +56,12 @@ spec:
           minAvailable: 1
           labels: {}
 
+        tracing:
+          enabled: true
+          endpoint: jaeger.jaeger:4317
+          insecure: true
+          protocol: grpc
+
   destination:
     server: https://kubernetes.default.svc
     namespace: demo-shop
