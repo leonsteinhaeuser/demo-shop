@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: ghcr.io/leonsteinhaeuser/demo-shop
     chart: item
-    targetRevision: "*"
+    targetRevision: "v0.4.1"
     helm:
       values: |
         replicaCount: 3
