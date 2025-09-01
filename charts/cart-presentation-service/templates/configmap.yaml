@@ -1,0 +1,13 @@
+{{- if .Values.tracing.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "item.fullname" . }}-tracing
+  labels:
+    {{- include "item.labels" . | nindent 4 }}
+data:
+  TRACING_SERVICE_VERSION: {{ .Chart.Version | quote }}
+  TRACING_ENDPOINT: {{ .Values.tracing.endpoint | quote }}
+  TRACING_INSECURE: {{ .Values.tracing.insecure | quote }}
+  TRACING_PROTOCOL: {{ .Values.tracing.protocol | quote }}
+{{- end }}

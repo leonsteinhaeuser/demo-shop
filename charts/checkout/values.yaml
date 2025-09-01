@@ -100,3 +100,9 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+tracing:
+  enabled: false
+  endpoint: ""
+  insecure: true
+  protocol: grpc
