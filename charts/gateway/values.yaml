@@ -47,7 +47,7 @@ service:
 
 route:
   enabled: false
-  subdomain: "checkout"
+  subdomain: "frontend"
   labels: {}
   tls:
     termination: edge

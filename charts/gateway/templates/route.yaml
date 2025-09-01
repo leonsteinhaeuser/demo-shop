@@ -7,6 +7,7 @@ metadata:
   name: {{ include "gateway.fullname" . }}
 spec:
   subdomain: {{ .Values.route.subdomain }}
+  path: /api
   tls:
     {{ .Values.route.tls | toYaml | nindent 4 }}
   to:
