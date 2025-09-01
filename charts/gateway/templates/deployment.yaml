@@ -48,8 +48,8 @@ spec:
               value: {{ .Values.upstreamServiceUrls.userService }}
             - name: CHECKOUT_SERVICE_URL
               value: {{ .Values.upstreamServiceUrls.checkoutService }}
-            - name: gateway_PRESENTATION_SERVICE_URL
-              value: {{ .Values.upstreamServiceUrls.gatewayPresentationService }}
+            - name: CART_PRESENTATION_SERVICE_URL
+              value: {{ .Values.upstreamServiceUrls.cartPresentationService }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

@@ -100,3 +100,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+upstreamServiceUrls:
+  gatewayService: http://gateway:8080

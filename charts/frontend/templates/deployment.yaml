@@ -36,6 +36,9 @@ spec:
           {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: GATEWAY_SERVICE_URL
+              value: {{ .Values.upstreamServiceUrls.gatewayService | quote }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

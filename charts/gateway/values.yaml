@@ -112,7 +112,7 @@ upstreamServiceUrls:
   itemService: http://item:8080
   userService: http://user:8080
   checkoutService: http://checkout:8080
-  gatewayPresentationService: http://gateway-presentation:8080
+  cartPresentationService: http://cart-presentation:8080
 
 secret:
   enabled: true
