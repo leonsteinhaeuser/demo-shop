@@ -1,4 +1,4 @@
-# Default values for frontend-service.
+# Default values for frontend.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -103,3 +103,13 @@ affinity: {}
 
 upstreamServiceUrls:
   gatewayService: http://gateway:8080
+
+# Pod Disruption Budget configuration
+podDisruptionBudget:
+  enabled: false
+  # Minimum number of pods that must be available during disruptions
+  minAvailable: 1
+  # Alternatively, specify the maximum number of pods that can be unavailable
+  # maxUnavailable: 1
+  # Labels to add to the PodDisruptionBudget
+  labels: {}

@@ -38,7 +38,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
             - configMapRef:
-                name: {{ include "item.fullname" . }}-tracing
+                name: {{ include "cart-presentation.fullname" . }}-tracing
           env:
             - name: CART_SERVICE_URL
               value: {{ .Values.upstreamServiceUrls.cartService }}

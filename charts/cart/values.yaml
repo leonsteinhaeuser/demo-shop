@@ -101,6 +101,41 @@ tolerations: []
 
 affinity: {}
 
+# ServiceMonitor configuration for Prometheus monitoring
+serviceMonitor:
+  enabled: false
+  labels: {}
+  annotations: {}
+  path: /metrics
+  interval: 30s
+  scrapeTimeout: 10s
+  metricRelabelings: []
+  relabelings: []
+  targetLabels: []
+  namespaceSelector: {}
+
+# PodMonitor configuration for Prometheus monitoring
+podMonitor:
+  enabled: false
+  labels: {}
+  annotations: {}
+  path: /metrics
+  interval: 30s
+  scrapeTimeout: 10s
+  metricRelabelings: []
+  relabelings: []
+  podTargetLabels: []
+  namespaceSelector: {}
+
+# PodDisruptionBudget configuration
+podDisruptionBudget:
+  enabled: false
+  labels: {}
+  annotations: {}
+  # Specify either minAvailable or maxUnavailable, not both
+  minAvailable: 1
+  # maxUnavailable: 1
+
 tracing:
   enabled: false
   endpoint: ""

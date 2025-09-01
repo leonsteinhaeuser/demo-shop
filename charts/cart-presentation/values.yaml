@@ -110,3 +110,49 @@ tracing:
 upstreamServiceUrls:
   cartService: http://cart:8080
   itemService: http://item:8080
+
+# Prometheus ServiceMonitor configuration
+serviceMonitor:
+  enabled: false
+  # Namespace where the ServiceMonitor should be created
+  namespace: ""
+  # Labels to add to the ServiceMonitor
+  labels: {}
+  # Interval for scraping metrics
+  interval: 30s
+  # Timeout for scraping metrics
+  scrapeTimeout: 10s
+  # Path to scrape metrics from
+  path: /metrics
+  # Additional relabeling configs
+  relabelings: []
+  # Additional metric relabeling configs
+  metricRelabelings: []
+
+# Prometheus PodMonitor configuration
+podMonitor:
+  enabled: false
+  # Namespace where the PodMonitor should be created
+  namespace: ""
+  # Labels to add to the PodMonitor
+  labels: {}
+  # Interval for scraping metrics
+  interval: 30s
+  # Timeout for scraping metrics
+  scrapeTimeout: 10s
+  # Path to scrape metrics from
+  path: /metrics
+  # Additional relabeling configs
+  relabelings: []
+  # Additional metric relabeling configs
+  metricRelabelings: []
+
+# Pod Disruption Budget configuration
+podDisruptionBudget:
+  enabled: false
+  # Minimum number of pods that must be available during disruptions
+  minAvailable: 1
+  # Alternatively, specify the maximum number of pods that can be unavailable
+  # maxUnavailable: 1
+  # Labels to add to the PodDisruptionBudget
+  labels: {}
