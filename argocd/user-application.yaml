@@ -13,14 +13,14 @@ spec:
   source:
     repoURL: ghcr.io/leonsteinhaeuser/demo-shop
     chart: user
-    targetRevision: "v0.4.4"
+    targetRevision: "v0.4.5"
     helm:
       values: |
         replicaCount: 2
 
         image:
           repository: ghcr.io/leonsteinhaeuser/demo-shop-user
-          tag: v0.4.4
+          tag: v0.4.5
 
         resources:
           limits:
