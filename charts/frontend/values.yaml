@@ -46,8 +46,8 @@ service:
   port: 80
 
 route:
-  enabled: false
-  subdomain: "user"
+  enabled: true
+  subdomain: "frontend"
   labels: {}
   tls:
     termination: edge
