@@ -13,14 +13,14 @@ spec:
   source:
     repoURL: ghcr.io/leonsteinhaeuser/demo-shop
     chart: frontend
-    targetRevision: "v0.4.7"
+    targetRevision: "v0.4.8"
     helm:
       values: |
         replicaCount: 3
 
         image:
           repository: ghcr.io/leonsteinhaeuser/demo-shop-frontend
-          tag: v0.4.7
+          tag: v0.4.8
 
         resources:
           limits:
@@ -37,7 +37,7 @@ spec:
           targetCPUUtilizationPercentage: 80
 
         upstreamServiceUrls:
-          gatewayService: https://gateway.apps.cluster-dgvvn.dynamic.redhatworkshops.io
+          gatewayService: https://frontend.apps.cluster-dgvvn.dynamic.redhatworkshops.io
 
         route:
           enabled: true

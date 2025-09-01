@@ -14,14 +14,14 @@ spec:
   source:
     repoURL: ghcr.io/leonsteinhaeuser/demo-shop
     chart: gateway
-    targetRevision: "v0.4.7"
+    targetRevision: "v0.4.8"
     helm:
       values: |
         replicaCount: 3
 
         image:
           repository: ghcr.io/leonsteinhaeuser/demo-shop-gateway
-          tag: v0.4.7
+          tag: v0.4.8
 
         resources:
           limits:
@@ -73,7 +73,7 @@ spec:
 
         route:
           enabled: true
-          subdomain: "gateway"
+          subdomain: "frontend"
           tls:
             termination: edge
 
