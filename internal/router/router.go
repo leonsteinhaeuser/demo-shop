@@ -51,6 +51,8 @@ var (
 	DefaultRouter = &Router{
 		apiObjects: make(map[string]ApiObject),
 		apiSpec:    []ApiObjectMeta{},
+		readyCh:    make(chan bool, 1),
+		livenessCh: make(chan bool, 2),
 	}
 )
 
@@ -63,11 +65,26 @@ type Router struct {
 
 	// apiSpec is a map of API paths and their methods
 	apiSpec []ApiObjectMeta
+
+	readyCh    chan bool
+	livenessCh chan bool
 }
 
 type ApiObjectMeta struct {
 	Path   string `json:"path"`
 	Method string `json:"method"`
+}
+
+func (r *Router) SetReady(prop bool) {
+	go func() {
+		r.readyCh <- prop
+	}()
+}
+
+func (r *Router) SetLiveness(prop bool) {
+	go func() {
+		r.livenessCh <- prop
+	}()
 }
 
 // RegisterPath registers a raw HTTP route with the router.
@@ -115,6 +132,21 @@ func (r *Router) Build(mux *http.ServeMux) error {
 			mux.HandleFunc(pobj.Method+" "+fpath, pobj.Func)
 		}
 	}
+	r.apiSpec = append(r.apiSpec,
+		ApiObjectMeta{
+			Path:   "/metrics",
+			Method: "GET",
+		}, ApiObjectMeta{
+			Path:   "/health/liveness",
+			Method: "GET",
+		}, ApiObjectMeta{
+			Path:   "/health/readiness",
+			Method: "GET",
+		},
+	)
+	mux.Handle("/metrics", promhttp.Handler())
+	mux.HandleFunc("GET /health/readiness", httpHealthz(r.readyCh))
+	mux.HandleFunc("GET /health/liveness", httpHealthz(r.livenessCh))
 	mux.HandleFunc("/api/metadata", func(wrt http.ResponseWriter, req *http.Request) {
 		wrt.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(wrt).Encode(r.apiSpec); err != nil {
@@ -127,7 +159,6 @@ func (r *Router) Build(mux *http.ServeMux) error {
 			return
 		}
 	})
-	mux.Handle("/metrics", promhttp.Handler())
 	return nil
 }
 
@@ -160,4 +191,21 @@ func EnableCorsHeader(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func httpHealthz(readyCh <-chan bool) func(w http.ResponseWriter, r *http.Request) {
+	isReady := false
+	go func() {
+		for {
+			isReady = <-readyCh
+		}
+	}()
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !isReady {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("OK"))
+	}
 }

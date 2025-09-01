@@ -74,6 +74,9 @@ func main() {
 		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
 
+	router.DefaultRouter.SetLiveness(true)
+	router.DefaultRouter.SetReady(true)
+
 	utils.StopSignalHandler(
 		func(ctx context.Context) {
 			slog.Info("API Gateway listening on :8080")

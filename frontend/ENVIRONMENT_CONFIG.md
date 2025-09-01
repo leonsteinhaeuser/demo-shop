@@ -8,8 +8,4 @@ The following environment variables configure the frontend API endpoints:
 
 | Variable | Description | Default Value |
 |----------|-------------|---------------|
-| `ITEMS_SERVICE_URL` | Items service base URL | `http://localhost:8081` |
-| `USERS_SERVICE_URL` | Users service base URL | `http://localhost:8084` |
-| `CARTS_SERVICE_URL` | Carts service base URL | `http://localhost:8082` |
-| `CHECKOUTS_SERVICE_URL` | Checkouts service base URL | `http://localhost:8085` |
-| `CART_PRESENTATION_SERVICE_URL` | Cart Presentation service base URL | `http://localhost:8083` |
+| `GATEWAY_SERVICE_URL` | Gateway service base URL | `http://localhost:8081` |

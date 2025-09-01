@@ -6,11 +6,11 @@ function getAPIConfig() {
 
     // Fallback configuration for local development
     return {
-        ITEMS_SERVICE_URL: 'http://localhost:8081',
-        USERS_SERVICE_URL: 'http://localhost:8084',
-        CARTS_SERVICE_URL: 'http://localhost:8082',
-        CHECKOUTS_SERVICE_URL: 'http://localhost:8085',
-        CART_PRESENTATION_SERVICE_URL: 'http://localhost:8083'
+        GATEWAY_SERVICE_URL: 'http://localhost:8081',
+        GATEWAY_SERVICE_URL: 'http://localhost:8084',
+        GATEWAY_SERVICE_URL: 'http://localhost:8082',
+        GATEWAY_SERVICE_URL: 'http://localhost:8085',
+        GATEWAY_SERVICE_URL: 'http://localhost:8083'
     };
 }
 
@@ -28,28 +28,28 @@ const API_ENDPOINTS = {
 const API_SERVICES = {
     get items() {
         const config = getAPIConfig();
-        return config.ITEMS_SERVICE_URL + API_ENDPOINTS.items;
+        return config.GATEWAY_SERVICE_URL + API_ENDPOINTS.items;
     },
     get users() {
         const config = getAPIConfig();
-        return config.USERS_SERVICE_URL + API_ENDPOINTS.users;
+        return config.GATEWAY_SERVICE_URL + API_ENDPOINTS.users;
     },
     get carts() {
         const config = getAPIConfig();
-        return config.CARTS_SERVICE_URL + API_ENDPOINTS.carts;
+        return config.GATEWAY_SERVICE_URL + API_ENDPOINTS.carts;
     },
     get checkouts() {
         const config = getAPIConfig();
-        return config.CHECKOUTS_SERVICE_URL + API_ENDPOINTS.checkouts;
+        return config.GATEWAY_SERVICE_URL + API_ENDPOINTS.checkouts;
     },
     get cartPresentation() {
         const config = getAPIConfig();
-        return config.CART_PRESENTATION_SERVICE_URL + API_ENDPOINTS.cartPresentation;
+        return config.GATEWAY_SERVICE_URL + API_ENDPOINTS.cartPresentation;
     },
     get auth() {
         const config = getAPIConfig();
         // Use any service URL for auth since they all point to the gateway
-        return config.ITEMS_SERVICE_URL + API_ENDPOINTS.auth;
+        return config.GATEWAY_SERVICE_URL + API_ENDPOINTS.auth;
     }
 };
 
@@ -237,7 +237,7 @@ class ApiClient {
     // API Metadata
     async getApiMetadata() {
         const config = getAPIConfig();
-        return this.request(`${config.ITEMS_SERVICE_URL}/api/metadata`);
+        return this.request(`${config.GATEWAY_SERVICE_URL}/api/metadata`);
     }
 }
 

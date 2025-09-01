@@ -116,12 +116,8 @@ services:
     ports:
       - "8088:80"
     environment:
-      - NGINX_ENTRYPOINT_QUIET_LOGS=1
-      - ITEMS_SERVICE_URL=http://localhost:8080
-      - USERS_SERVICE_URL=http://localhost:8080
-      - CARTS_SERVICE_URL=http://localhost:8080
-      - CHECKOUTS_SERVICE_URL=http://localhost:8080
-      - CART_PRESENTATION_SERVICE_URL=http://localhost:8080
+      NGINX_ENTRYPOINT_QUIET_LOGS: "1"
+      GATEWAY_SERVICE_URL: http://localhost:8080
     depends_on:
       - gateway
 
