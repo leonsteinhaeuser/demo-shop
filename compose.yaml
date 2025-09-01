@@ -114,7 +114,7 @@ services:
       context: .
       dockerfile: frontend/Containerfile
     ports:
-      - "8088:80"
+      - "8088:8080"
     environment:
       NGINX_ENTRYPOINT_QUIET_LOGS: "1"
       GATEWAY_SERVICE_URL: http://localhost:8080

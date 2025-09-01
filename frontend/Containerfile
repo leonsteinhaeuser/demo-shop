@@ -24,12 +24,12 @@ RUN chmod +x /docker-entrypoint.sh
 COPY frontend/health-check.sh /usr/local/bin/health-check.sh
 RUN chmod +x /usr/local/bin/health-check.sh
 
-# Expose port 80
-EXPOSE 80
+# Expose port 8080
+EXPOSE 8080
 
 # Add health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost/health/liveness || exit 1
+    CMD curl -f http://localhost:8080/health/liveness || exit 1
 
 # Start with configuration generation
 CMD ["/docker-entrypoint.sh"]
