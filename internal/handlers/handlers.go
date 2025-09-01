@@ -211,21 +211,3 @@ func HttpDelete[T any](deleteFunc func(context.Context, *http.Request, *T) error
 		}
 	}
 }
-
-func HttpHealthz(readyCh <-chan bool) func(w http.ResponseWriter, r *http.Request) {
-	isReady := false
-	go func() {
-		for {
-			ready := <-readyCh
-			isReady = ready
-		}
-	}()
-	return func(w http.ResponseWriter, r *http.Request) {
-		if !isReady {
-			w.WriteHeader(http.StatusServiceUnavailable)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("OK"))
-	}
-}
