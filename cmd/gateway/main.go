@@ -51,12 +51,24 @@ func main() {
 	// Print build information
 	slog.Info("API Gateway", "version", version, "commit", commit, "date", date)
 
-	// Initialize gateway
-	gateway := v1.NewGateway(envUserServiceURL, envCartServiceURL, envItemServiceURL, envCheckoutServiceURL, envCartPresentationServiceURL, envCookieEncryptionKey)
-
 	// Create multiplexer and register routes
 	mux := http.NewServeMux()
-	gateway.RegisterRoutes(mux)
+
+	// Initialize gateway
+	v1.NewGateway(
+		envUserServiceURL,
+		envCartServiceURL,
+		envItemServiceURL,
+		envCheckoutServiceURL,
+		envCartPresentationServiceURL,
+		envCookieEncryptionKey,
+	).RegisterRoutes(mux)
+
+	err = router.DefaultRouter.Build(mux)
+	if err != nil {
+		slog.Error("Failed to build router", "error", err)
+		os.Exit(1)
+	}
 
 	// Configure server with timeouts
 	server := &http.Server{
