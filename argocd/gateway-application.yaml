@@ -71,6 +71,12 @@ spec:
           insecure: true
           protocol: grpc
 
+        route:
+          enabled: true
+          subdomain: "gateway"
+          tls:
+            termination: edge
+
   destination:
     server: https://kubernetes.default.svc
     namespace: demo-shop

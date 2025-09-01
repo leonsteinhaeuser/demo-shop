@@ -37,7 +37,7 @@ spec:
           targetCPUUtilizationPercentage: 80
 
         upstreamServiceUrls:
-          gatewayService: https://apps.cluster-dgvvn.dynamic.redhatworkshops.io
+          gatewayService: https://gateway.apps.cluster-dgvvn.dynamic.redhatworkshops.io
 
         route:
           enabled: true
