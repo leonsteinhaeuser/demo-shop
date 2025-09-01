@@ -38,3 +38,37 @@ jobs:
         args: release --clean
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  chart_release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yq
+
+      - name: Set version field in charts
+        run: |
+          yq -yi '.version = "${{ github.ref_name }}"' charts/cart/Chart.yaml
+          yq -yi '.version = "${{ github.ref_name }}"' charts/cart-presentation/Chart.yaml
+          yq -yi '.version = "${{ github.ref_name }}"' charts/checkout/Chart.yaml
+          yq -yi '.version = "${{ github.ref_name }}"' charts/frontend/Chart.yaml
+          yq -yi '.version = "${{ github.ref_name }}"' charts/gateway/Chart.yaml
+          yq -yi '.version = "${{ github.ref_name }}"' charts/item/Chart.yaml
+          yq -yi '.version = "${{ github.ref_name }}"' charts/user/Chart.yaml
+
+      - name: Run chart-releaser
+        uses: k8scope/helm-chart-releaser-action@v1.0.0
+        with:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+          chart_repository_url: oci://ghcr.io/leonsteinhaeuser/demo-shop
+          chart_repository_username: ${{ github.actor }}
+          chart_repository_password: ${{ secrets.GITHUB_TOKEN }}
