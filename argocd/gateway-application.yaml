@@ -22,6 +22,7 @@ spec:
 
         image:
           repository: ghcr.io/leonsteinhaeuser/demo-shop-gateway
+          tag: v0.4.0
 
         resources:
           limits:

@@ -20,6 +20,7 @@ spec:
 
         image:
           repository: ghcr.io/leonsteinhaeuser/demo-shop-cartpresentation
+          tag: v0.4.0
 
         resources:
           limits:
