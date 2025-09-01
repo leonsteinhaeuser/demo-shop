@@ -2,7 +2,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: item
-  namespace: argocd
   labels:
     app.kubernetes.io/name: demo-shop-item
     app.kubernetes.io/part-of: demo-shop
