@@ -7,7 +7,7 @@ replicaCount: 1
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: ghcr.io/leonsteinhaeuser/demo-shop-cart-cartpresentation
+  repository: ghcr.io/leonsteinhaeuser/demo-shop-cart
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
@@ -47,7 +47,7 @@ service:
 
 route:
   enabled: false
-  subdomain: "cart-cartpresentation"
+  subdomain: "cart"
   labels: {}
   tls:
     termination: edge
@@ -106,3 +106,7 @@ tracing:
   endpoint: ""
   insecure: true
   protocol: grpc
+
+upstreamServiceUrls:
+  cartService: http://cart:8080
+  itemService: http://item:8080
