@@ -1,4 +1,4 @@
-# Default values for cart-service.
+# Default values for checkout-service.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -106,3 +106,7 @@ tracing:
   endpoint: ""
   insecure: true
   protocol: grpc
+
+upstreamServiceUrls:
+  cartService: http://cart:8080
+  itemService: http://item:8080

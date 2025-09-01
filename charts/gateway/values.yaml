@@ -1,4 +1,4 @@
-# Default values for cart-service.
+# Default values for gateway-service.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -7,7 +7,7 @@ replicaCount: 1
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: ghcr.io/leonsteinhaeuser/demo-shop-cart
+  repository: ghcr.io/leonsteinhaeuser/demo-shop-checkout
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
@@ -47,7 +47,7 @@ service:
 
 route:
   enabled: false
-  subdomain: "cart"
+  subdomain: "checkout"
   labels: {}
   tls:
     termination: edge
@@ -106,3 +106,19 @@ tracing:
   endpoint: ""
   insecure: true
   protocol: grpc
+
+upstreamServiceUrls:
+  cartService: http://cart:8080
+  itemService: http://item:8080
+  userService: http://user:8080
+  checkoutService: http://checkout:8080
+  gatewayPresentationService: http://gateway-presentation:8080
+
+secret:
+  enabled: true
+  value: a_random_secret_key
+
+  # reference to existing secret
+  secretKeyRef: {}
+    # name: cookie-encryption
+    # key: secret

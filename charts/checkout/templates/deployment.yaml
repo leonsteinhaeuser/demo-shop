@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "cart-service.fullname" . }}
+  name: {{ include "checkout-service.fullname" . }}
   labels:
-    {{- include "cart-service.labels" . | nindent 4 }}
+    {{- include "checkout-service.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "cart-service.selectorLabels" . | nindent 6 }}
+      {{- include "checkout-service.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,7 +18,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "cart-service.labels" . | nindent 8 }}
+        {{- include "checkout-service.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -27,7 +27,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "cart-service.serviceAccountName" . }}
+      serviceAccountName: {{ include "checkout-service.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
@@ -39,6 +39,11 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "item.fullname" . }}-tracing
+          env:
+            - name: CART_SERVICE_URL
+              value: {{ .Values.upstreamServiceUrls.cartService }}
+            - name: ITEM_SERVICE_URL
+              value: {{ .Values.upstreamServiceUrls.itemService }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

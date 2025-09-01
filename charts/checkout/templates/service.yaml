@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "cart-service.fullname" . }}
+  name: {{ include "checkout-service.fullname" . }}
   labels:
-    {{- include "cart-service.labels" . | nindent 4 }}
+    {{- include "checkout-service.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "cart-service.selectorLabels" . | nindent 4 }}
+    {{- include "checkout-service.selectorLabels" . | nindent 4 }}
