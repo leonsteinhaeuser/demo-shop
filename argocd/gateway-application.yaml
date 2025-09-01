@@ -14,14 +14,14 @@ spec:
   source:
     repoURL: ghcr.io/leonsteinhaeuser/demo-shop
     chart: gateway
-    targetRevision: "v0.4.8"
+    targetRevision: "v0.5.0"
     helm:
       values: |
         replicaCount: 3
 
         image:
           repository: ghcr.io/leonsteinhaeuser/demo-shop-gateway
-          tag: v0.4.8
+          tag: v0.5.0
 
         resources:
           limits:
@@ -40,7 +40,7 @@ spec:
         upstreamServiceUrls:
           cartService: http://cart:8080
           itemService: http://item:8080
-          userService: http://user:8080
+          userService: http://demo-shop-user:8080
           checkoutService: http://checkout:8080
           cartPresentationService: http://cart-presentation:8080
 
