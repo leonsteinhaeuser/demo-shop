@@ -44,6 +44,8 @@ jobs:
     permissions:
       contents: write
       packages: write
+    needs:
+      - release
     steps:
       - name: Checkout
         uses: actions/checkout@v3
