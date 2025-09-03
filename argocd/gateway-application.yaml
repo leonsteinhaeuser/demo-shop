@@ -25,10 +25,10 @@ spec:
 
         resources:
           limits:
-            cpu: 10m
+            cpu: 1m
             memory: 32Mi
           requests:
-            cpu: 10m
+            cpu: 1m
             memory: 32Mi
 
         autoscaling:
