@@ -16,6 +16,12 @@ func TracingMiddleware(serviceName string) func(http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/health/readiness" || r.URL.Path == "/health/liveness" || r.URL.Path == "/metrics" {
+				// if the url is either a health or metrics endpoint, skip tracing
+				next.ServeHTTP(w, r)
+				return
+			}
+
 			// Extract trace context from incoming request
 			ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
 
