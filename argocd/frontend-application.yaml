@@ -37,7 +37,7 @@ spec:
           targetCPUUtilizationPercentage: 80
 
         upstreamServiceUrls:
-          gatewayService: https://frontend.apps.cluster-dgvvn.dynamic.redhatworkshops.io
+          gatewayService: https://frontend.apps.hcp1.k8scope.dev/
 
         route:
           enabled: true
