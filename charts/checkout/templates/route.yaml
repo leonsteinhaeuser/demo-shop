@@ -2,8 +2,10 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
+  {{- with .Values.route.labels }}
   labels:
-    {{ .Values.route.labels | toYaml | nindent 4 }}
+    {{ . | toYaml | nindent 4 }}
+  {{- end }}
   name: {{ include "checkout.fullname" . }}
 spec:
   subdomain: {{ .Values.route.subdomain }}
