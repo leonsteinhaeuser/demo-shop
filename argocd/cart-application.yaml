@@ -46,18 +46,6 @@ spec:
           insecure: true
           protocol: grpc
 
-        volumes:
-          - name: foo
-            secret:
-               secretName: mysecret
-               optional: false
-  
-        volumeMounts:
-          - name: foo
-            mountPath: "/etc/foo"
-            readOnly: true
-
-
   destination:
     server: https://kubernetes.default.svc
     namespace: demo-shop
