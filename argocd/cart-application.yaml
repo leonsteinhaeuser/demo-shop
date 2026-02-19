@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cart
+  name: cart-qa
   labels:
     app.kubernetes.io/name: demo-shop-cart
     app.kubernetes.io/part-of: demo-shop
@@ -9,7 +9,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: demo
+  project: demo-qa
   source:
     repoURL: ghcr.io/leonsteinhaeuser/demo-shop
     chart: cart
@@ -48,7 +48,7 @@ spec:
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: demo-shop
+    namespace: demo-shop-qa
 
   syncPolicy:
     automated:
