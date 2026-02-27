@@ -6,8 +6,6 @@ metadata:
     app.kubernetes.io/name: demo-shop-frontend
     app.kubernetes.io/part-of: demo-shop
     app.kubernetes.io/component: frontend
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: demo-qa
   source:
@@ -37,11 +35,11 @@ spec:
           targetCPUUtilizationPercentage: 80
 
         upstreamServiceUrls:
-          gatewayService: https://frontend.apps.hcp1.k8scope.dev
+          gatewayService: https://frontend-qa.apps.hcp1.k8scope.dev
 
         route:
           enabled: true
-          subdomain: "frontend"
+          subdomain: "frontend-qa"
           tls:
             termination: edge
 

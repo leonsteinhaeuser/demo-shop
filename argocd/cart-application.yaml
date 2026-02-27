@@ -6,8 +6,6 @@ metadata:
     app.kubernetes.io/name: demo-shop-cart
     app.kubernetes.io/part-of: demo-shop
     app.kubernetes.io/component: backend-service
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: demo-qa
   source:

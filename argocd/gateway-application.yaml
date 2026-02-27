@@ -6,8 +6,6 @@ metadata:
     app.kubernetes.io/name: demo-shop-gateway
     app.kubernetes.io/part-of: demo-shop
     app.kubernetes.io/component: gateway
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: demo-qa
 
@@ -73,7 +71,7 @@ spec:
 
         route:
           enabled: true
-          subdomain: "frontend"
+          subdomain: "frontend-qa"
           tls:
             termination: edge
 
